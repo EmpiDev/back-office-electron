@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS categories (
 -- C’est la “brique fonctionnelle” de base, sans notion commerciale directe (pas de prix ici).
 CREATE TABLE IF NOT EXISTS services (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    code TEXT NOT NULL UNIQUE,
+    tag TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     description TEXT,
     -- Unité de l'intervention (ex: 'Jours', 'Heures', 'Forfait', 'Ticket', 'Utilisateur')
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS services (
 -- C'est ce que l'on vend au client.
 CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    code TEXT NOT NULL UNIQUE,
+    tag TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     description TEXT,
     target_segment TEXT,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS pricing_plans (
 -- Options additionnelles vendables avec un produit
 CREATE TABLE IF NOT EXISTS options (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    code TEXT NOT NULL UNIQUE,
+    tag TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     description TEXT,
     price REAL,

@@ -15,7 +15,7 @@
   },
   "common": {
     "refresh": "Refresh",
-    "code": "Code",
+    "tag": "Tag",
     "name": "Name",
     "delete": "Delete",
     "actions": "Actions",

@@ -5,11 +5,11 @@ const { dbRun, dbGet, dbAll } = require('../db-helper');
 // Create Product
 const createProduct = async (product) => {
     const sql = `
-        INSERT INTO products (code, name, description, target_segment, is_in_carousel, is_top_product, price, payment_type)
+        INSERT INTO products (tag, name, description, target_segment, is_in_carousel, is_top_product, price, payment_type)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const result = await dbRun(sql, [
-        product.code, 
+        product.tag, 
         product.name, 
         product.description, 
         product.target_segment, 
@@ -33,21 +33,21 @@ const getProductById = async (id) => {
     return await dbGet(sql, [id]);
 };
 
-// Read One Product by Code
-const getProductByCode = async (code) => {
-    const sql = `SELECT * FROM products WHERE code = ?`;
-    return await dbGet(sql, [code]);
+// Read One Product by Tag
+const getProductByTag = async (tag) => {
+    const sql = `SELECT * FROM products WHERE tag = ?`;
+    return await dbGet(sql, [tag]);
 };
 
 // Update Product
 const updateProduct = async (id, product) => {
     const sql = `
         UPDATE products
-        SET code = ?, name = ?, description = ?, target_segment = ?, is_in_carousel = ?, is_top_product = ?, price = ?, payment_type = ?, updated_at = CURRENT_TIMESTAMP
+        SET tag = ?, name = ?, description = ?, target_segment = ?, is_in_carousel = ?, is_top_product = ?, price = ?, payment_type = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
     `;
     await dbRun(sql, [
-        product.code, 
+        product.tag, 
         product.name, 
         product.description, 
         product.target_segment, 
@@ -87,7 +87,7 @@ const removeServiceFromProduct = async (productId, serviceId) => {
 // Get Services associated with a Product
 const getServicesForProduct = async (productId) => {
     const sql = `
-        SELECT ps.service_id, ps.quantity, s.code, s.name, s.description, s.unit
+        SELECT ps.service_id, ps.quantity, s.tag, s.name, s.description, s.unit
         FROM product_services ps
         JOIN services s ON ps.service_id = s.id
         WHERE ps.product_id = ?
@@ -121,7 +121,7 @@ module.exports = {
     createProduct,
     getAllProducts,
     getProductById,
-    getProductByCode,
+    getProductByTag,
     updateProduct,
     deleteProduct,
     getPlansByProductId,

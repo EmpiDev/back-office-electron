@@ -71,6 +71,9 @@ ipcMain.handle('services:update', async (_event, id, service) => {
 ipcMain.handle('services:delete', async (_event, id) => {
     return await serviceService.deleteService(id);
 });
+ipcMain.handle('services:get-by-tag', async (_event, tag) => {
+    return await serviceService.getServiceByTag(tag);
+});
 
 // Products
 ipcMain.handle('products:get-all', async () => {
@@ -84,6 +87,9 @@ ipcMain.handle('products:update', async (_event, id, product) => {
 });
 ipcMain.handle('products:delete', async (_event, id) => {
     return await productService.deleteProduct(id);
+});
+ipcMain.handle('products:get-by-tag', async (_event, tag) => {
+    return await productService.getProductByTag(tag);
 });
 
 // Handlers for Product-Service relationships

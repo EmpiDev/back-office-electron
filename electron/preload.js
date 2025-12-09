@@ -16,12 +16,14 @@ contextBridge.exposeInMainWorld("electronApi", {
     createService: (service) => ipcRenderer.invoke('services:create', service),
     updateService: (id, service) => ipcRenderer.invoke('services:update', id, service),
     deleteService: (id) => ipcRenderer.invoke('services:delete', id),
+    getServiceByTag: (tag) => ipcRenderer.invoke('services:get-by-tag', tag),
 
     // Products
     getProducts: () => ipcRenderer.invoke('products:get-all'),
     createProduct: (product) => ipcRenderer.invoke('products:create', product),
     updateProduct: (id, product) => ipcRenderer.invoke('products:update', id, product),
     deleteProduct: (id) => ipcRenderer.invoke('products:delete', id),
+    getProductByTag: (tag) => ipcRenderer.invoke('products:get-by-tag', tag),
     
     //Product-Service management functions
     addServiceToProduct: (productId, serviceId, quantity) => ipcRenderer.invoke('products:add-service', productId, serviceId, quantity),

@@ -11,7 +11,7 @@ export interface User {
 
 export interface Service {
   id?: number;
-  code: string;
+  tag: string;
   name: string;
   description?: string | null;
   category_id?: number | null;
@@ -22,7 +22,7 @@ export interface Service {
 
 export interface Product {
   id?: number;
-  code: string;
+  tag: string;
   name: string;
   description?: string | null;
   target_segment?: string | null;
@@ -62,12 +62,14 @@ declare global {
     createService: (service: Service) => Promise<Service>;
     updateService: (id: number, service: Service) => Promise<Service>;
     deleteService: (id: number) => Promise<void>;
+    getServiceByTag: (tag: string) => Promise<Service>;
 
     // Products
     getProducts: () => Promise<Product[]>;
     createProduct: (product: Product) => Promise<Product>;
     updateProduct: (id: number, product: Product) => Promise<Product>;
     deleteProduct: (id: number) => Promise<void>;
+    getProductByTag: (tag: string) => Promise<Product>;
     
     // Product Services Management
     addServiceToProduct: (productId: number, serviceId: number, quantity: number) => Promise<any>;

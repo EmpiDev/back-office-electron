@@ -5,10 +5,10 @@ const { dbRun, dbGet, dbAll } = require('../db-helper');
 // Create
 const createService = async (service) => {
     const sql = `
-        INSERT INTO services (code, name, description, unit, category_id)
+        INSERT INTO services (tag, name, description, unit, category_id)
         VALUES (?, ?, ?, ?, ?)
     `;
-    const result = await dbRun(sql, [service.code, service.name, service.description, service.unit, service.category_id]);
+    const result = await dbRun(sql, [service.tag, service.name, service.description, service.unit, service.category_id]);
     return { id: result.id, ...service };
 };
 
@@ -33,20 +33,20 @@ const getServiceById = async (id) => {
     return await dbGet(sql, [id]);
 };
 
-// Read (By Code)
-const getServiceByCode = async (code) => {
-    const sql = `SELECT * FROM services WHERE code = ?`;
-    return await dbGet(sql, [code]);
+// Read (By Tag)
+const getServiceByTag = async (tag) => {
+    const sql = `SELECT * FROM services WHERE tag = ?`;
+    return await dbGet(sql, [tag]);
 };
 
 // Update
 const updateService = async (id, service) => {
     const sql = `
         UPDATE services
-        SET code = ?, name = ?, description = ?, unit = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP
+        SET tag = ?, name = ?, description = ?, unit = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
     `;
-    await dbRun(sql, [service.code, service.name, service.description, service.unit, service.category_id, id]);
+    await dbRun(sql, [service.tag, service.name, service.description, service.unit, service.category_id, id]);
     return await getServiceById(id);
 };
 
@@ -60,7 +60,7 @@ module.exports = {
     createService,
     getAllServices,
     getServiceById,
-    getServiceByCode,
+    getServiceByTag,
     updateService,
     deleteService
 };

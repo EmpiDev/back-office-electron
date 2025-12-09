@@ -17,14 +17,14 @@ Ce dossier contient la couche d'accès aux données de l'application Back-Office
 
 ### Products (Produits Commerciaux)
 Table : `products`
-- `code`, `name`, `description`
+- `tag`, `name`, `description`
 - `price` (REAL) : Prix du produit.
 - `payment_type` (TEXT) : Type de facturation ('one_time' ou 'monthly').
 - `is_in_carousel`, `is_top_product` : Attributs de mise en avant.
 
 ### Services (Briques Métier)
 Table : `services`
-- `code`, `name`, `description`
+- `tag`, `name`, `description`
 - `unit` : Unité de comptage (Jours, Tickets...).
 - `category_id` : Lien vers la table `categories`.
 

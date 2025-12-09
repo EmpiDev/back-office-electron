@@ -8,7 +8,7 @@ export default function ServicesPage() {
     const { t } = useTranslation();
     const [services, setServices] = useState<any[]>([]);
     const [openDialog, setOpenDialog] = useState(false);
-    const [newService, setNewService] = useState({ code: '', name: '', description: '', category_id: null });
+    const [newService, setNewService] = useState({ tag: '', name: '', description: '', category_id: null });
     const [editingServiceId, setEditingServiceId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -23,14 +23,14 @@ export default function ServicesPage() {
 
     const handleOpenCreateDialog = () => {
         setEditingServiceId(null);
-        setNewService({ code: '', name: '', description: '', category_id: null });
+        setNewService({ tag: '', name: '', description: '', category_id: null });
         setOpenDialog(true);
     };
 
     const handleEditService = (service: any) => {
         setEditingServiceId(service.id);
         setNewService({
-            code: service.code,
+            tag: service.tag,
             name: service.name,
             description: service.description || '',
             category_id: service.category_id
@@ -44,7 +44,7 @@ export default function ServicesPage() {
         } else {
             await window.electronApi.createService(newService);
         }
-        setNewService({ code: '', name: '', description: '', category_id: null });
+        setNewService({ tag: '', name: '', description: '', category_id: null });
         setEditingServiceId(null);
         setOpenDialog(false);
         loadData();
@@ -56,13 +56,13 @@ export default function ServicesPage() {
     };
 
     const columns: Column<any>[] = [
-        { id: 'code', label: t('common.code') },
+        { id: 'tag', label: t('common.tag') },
         { id: 'name', label: t('common.name') },
     ];
 
     const filteredServices = services.filter(s => 
         s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        s.code.toLowerCase().includes(searchTerm.toLowerCase())
+        s.tag.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -112,9 +112,9 @@ export default function ServicesPage() {
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12 }}>
                                 <TextField 
-                                    label={t('common.code')} 
-                                    value={newService.code} 
-                                    onChange={e => setNewService({ ...newService, code: e.target.value })} 
+                                    label={t('common.tag')} 
+                                    value={newService.tag} 
+                                    onChange={e => setNewService({ ...newService, tag: e.target.value })} 
                                     fullWidth 
                                 />
                             </Grid>

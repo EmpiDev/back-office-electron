@@ -9,7 +9,7 @@ export default function ProductsPage() {
     const [products, setProducts] = useState<any[]>([]);
     const [allServices, setAllServices] = useState<any[]>([]); // New state for all available services
     const [openDialog, setOpenDialog] = useState(false);
-    const [newProduct, setNewProduct] = useState<any>({ code: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Updated fields
+    const [newProduct, setNewProduct] = useState<any>({ tag: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Updated fields
     const [selectedServicesInForm, setSelectedServicesInForm] = useState<Array<{ serviceId: number; quantity: number }>>([]); // New state for selected services
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -27,7 +27,7 @@ export default function ProductsPage() {
 
     const handleOpenCreateDialog = () => {
         setEditingProductId(null);
-        setNewProduct({ code: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' });
+        setNewProduct({ tag: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' });
         setSelectedServicesInForm([]);
         setOpenDialog(true);
     };
@@ -35,7 +35,7 @@ export default function ProductsPage() {
     const handleEditProduct = async (product: any) => {
         setEditingProductId(product.id);
         setNewProduct({ 
-            code: product.code, 
+            tag: product.tag, 
             name: product.name, 
             description: product.description, 
             target_segment: product.target_segment, 
@@ -56,22 +56,7 @@ export default function ProductsPage() {
         let savedProduct;
         if (editingProductId) {
              savedProduct = await window.electronApi.updateProduct(editingProductId, newProduct);
-             // For update, we might want to clear existing services and re-add them, or handle diff. 
-             // For simplicity, let's assume we clear and re-add or just add (if API supports it).
-             // Ideally backend should handle "sync". Here we will just add/replace.
-             // To do it cleanly without "sync" logic on backend, we might need to remove all first? 
-             // Or we rely on `addServiceToProduct` being an INSERT OR REPLACE or similar?
-             // Checking `product.service.js`: `addServiceToProduct` uses `INSERT OR REPLACE`. 
-             // However, to remove services that were de-selected, we need explicit removal.
              
-             // Simplest approach for now: Get existing, compare, add/remove. 
-             // OR: Remove all services for product and re-add.
-             // Let's go with: Remove all manually (if we had a removeAll) or just iterate.
-             
-             // Actually, let's just re-add/update for now. 
-             // NOTE: This logic won't remove services if they are unchecked. 
-             // TODO: Implement proper sync. For now, let's assume user adds/modifies. 
-             // To support removal, we need `removeServiceFromProduct`.
              const currentServices = await window.electronApi.getServicesForProduct(editingProductId);
              for(const s of currentServices) {
                  if(!selectedServicesInForm.find(newS => newS.serviceId === s.service_id)) {
@@ -89,7 +74,7 @@ export default function ProductsPage() {
             await window.electronApi.addServiceToProduct(productId!, selectedService.serviceId, selectedService.quantity);
         }
         
-        setNewProduct({ code: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Reset form
+        setNewProduct({ tag: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Reset form
         setSelectedServicesInForm([]); // Reset selected services
         setEditingProductId(null);
         setOpenDialog(false);
@@ -102,7 +87,7 @@ export default function ProductsPage() {
     };
 
     const columns: Column<any>[] = [
-        { id: 'code', label: t('common.code') },
+        { id: 'tag', label: t('common.tag') },
         { id: 'name', label: t('common.name') },
         { id: 'price', label: 'Prix', format: (value, row) => `${value} €` },
         { id: 'payment_type', label: 'Type de paiement', format: (value) => value === 'monthly' ? 'Par mois' : 'En une fois' },
@@ -125,7 +110,7 @@ export default function ProductsPage() {
 
     const filteredProducts = products.filter(p => 
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        p.code.toLowerCase().includes(searchTerm.toLowerCase())
+        p.tag.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -177,9 +162,9 @@ export default function ProductsPage() {
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12 }}>
                                 <TextField 
-                                    label={t('common.code')} 
-                                    value={newProduct.code} 
-                                    onChange={e => setNewProduct({ ...newProduct, code: e.target.value })} 
+                                    label={t('common.tag')} 
+                                    value={newProduct.tag} 
+                                    onChange={e => setNewProduct({ ...newProduct, tag: e.target.value })} 
                                     fullWidth 
                                 />
                             </Grid>

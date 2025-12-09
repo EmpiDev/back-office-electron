@@ -15,7 +15,7 @@
   },
   "common": {
     "refresh": "Actualiser",
-    "code": "Code",
+    "tag": "Tag",
     "name": "Nom",
     "delete": "Supprimer",
     "actions": "Actions",
