@@ -77,6 +77,25 @@ ipcMain.handle('products:delete', async (_event, id) => {
     return await productService.deleteProduct(id);
 });
 
+// Handlers for Product-Service relationships
+ipcMain.handle('products:add-service', async (_event, productId, serviceId, quantity) => {
+    return await productService.addServiceToProduct(productId, serviceId, quantity);
+});
+ipcMain.handle('products:remove-service', async (_event, productId, serviceId) => {
+    return await productService.removeServiceFromProduct(productId, serviceId);
+});
+ipcMain.handle('products:get-services-for-product', async (_event, productId) => {
+    return await productService.getServicesForProduct(productId);
+});
+
+// Pricing Plans
+ipcMain.handle('products:get-plans', async (_event, productId) => {
+    return await productService.getPlansByProductId(productId);
+});
+ipcMain.handle('products:add-plan', async (_event, productId, plan) => {
+    return await productService.addPlanToProduct(productId, plan);
+});
+
 
 app.whenReady().then(() => {
     initDB();

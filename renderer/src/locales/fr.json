@@ -19,13 +19,15 @@
     "name": "Nom",
     "delete": "Supprimer",
     "actions": "Actions",
-    "noData": "Aucune donnée disponible"
+    "noData": "Aucune donnée disponible",
+    "quantity": "Quantité"
   },
   "products": {
     "title": "Gestion des Produits",
     "addProduct": "Ajouter un Produit",
     "add": "Ajouter",
-    "list": "Liste des Produits"
+    "list": "Liste des Produits",
+    "selectServices": "Sélectionner les Services"
   },
   "services": {
     "title": "Gestion des Services",

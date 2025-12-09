@@ -26,7 +26,19 @@ export interface Product {
   name: string;
   description?: string | null;
   target_segment?: string | null;
-  is_highlighted?: boolean;
+  is_in_carousel?: boolean;
+  is_top_product?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface PricingPlan {
+  id?: number;
+  product_id?: number;
+  name: string;
+  price: number;
+  currency?: string;
+  billing_interval?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -39,7 +51,7 @@ declare global {
 
     // Users
     getUsers: () => Promise<User[]>;
-      createUser: (user: User) => Promise<User>;
+    createUser: (user: User) => Promise<User>;
     deleteUser(id: number): unknown;
 
     // Services
@@ -51,6 +63,15 @@ declare global {
     getProducts: () => Promise<Product[]>;
     createProduct: (product: Product) => Promise<Product>;
     deleteProduct: (id: number) => Promise<void>;
+    
+    // Product Services Management
+    addServiceToProduct: (productId: number, serviceId: number, quantity: number) => Promise<any>;
+    removeServiceFromProduct: (productId: number, serviceId: number) => Promise<void>;
+    getServicesForProduct: (productId: number) => Promise<any[]>;
+
+    // Pricing Plans
+    getPlansByProductId: (productId: number) => Promise<PricingPlan[]>;
+    addPlanToProduct: (productId: number, plan: PricingPlan) => Promise<PricingPlan>;
   }
 
   interface Window {

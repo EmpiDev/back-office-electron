@@ -19,4 +19,13 @@ contextBridge.exposeInMainWorld("electronApi", {
     getProducts: () => ipcRenderer.invoke('products:get-all'),
     createProduct: (product) => ipcRenderer.invoke('products:create', product),
     deleteProduct: (id) => ipcRenderer.invoke('products:delete', id),
+    
+    //Product-Service management functions
+    addServiceToProduct: (productId, serviceId, quantity) => ipcRenderer.invoke('products:add-service', productId, serviceId, quantity),
+    removeServiceFromProduct: (productId, serviceId) => ipcRenderer.invoke('products:remove-service', productId, serviceId),
+    getServicesForProduct: (productId) => ipcRenderer.invoke('products:get-services-for-product', productId),
+
+    // Pricing Plans
+    getPlansByProductId: (productId) => ipcRenderer.invoke('products:get-plans', productId),
+    addPlanToProduct: (productId, plan) => ipcRenderer.invoke('products:add-plan', productId, plan),
 });

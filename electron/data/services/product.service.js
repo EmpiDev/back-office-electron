@@ -1,8 +1,8 @@
 const { dbRun, dbGet, dbAll } = require('../db-helper');
 
-// --- CRUD ---
+// --- CRUD for Products ---
 
-// Create
+// Create Product
 const createProduct = async (product) => {
     const sql = `
         INSERT INTO products (code, name, description, target_segment, is_in_carousel, is_top_product)
@@ -19,25 +19,25 @@ const createProduct = async (product) => {
     return { id: result.id, ...product };
 };
 
-// Read (All)
+// Read All Products
 const getAllProducts = async () => {
     const sql = `SELECT * FROM products`;
     return await dbAll(sql);
 };
 
-// Read (One)
+// Read One Product by ID
 const getProductById = async (id) => {
     const sql = `SELECT * FROM products WHERE id = ?`;
     return await dbGet(sql, [id]);
 };
 
-// Read (By Code)
+// Read One Product by Code
 const getProductByCode = async (code) => {
     const sql = `SELECT * FROM products WHERE code = ?`;
     return await dbGet(sql, [code]);
 };
 
-// Update
+// Update Product
 const updateProduct = async (id, product) => {
     const sql = `
         UPDATE products
@@ -56,13 +56,42 @@ const updateProduct = async (id, product) => {
     return await getProductById(id);
 };
 
-// Delete
+// Delete Product
 const deleteProduct = async (id) => {
     const sql = `DELETE FROM products WHERE id = ?`;
     return await dbRun(sql, [id]);
 };
 
-// --- Sub-Resources: Pricing Plans (Example of One-to-Many management) ---
+// --- Management of Product-Service Relationships (product_services table) ---
+
+// Add a Service to a Product
+const addServiceToProduct = async (productId, serviceId, quantity = 1) => {
+    const sql = `
+        INSERT OR REPLACE INTO product_services (product_id, service_id, quantity)
+        VALUES (?, ?, ?)
+    `;
+    const result = await dbRun(sql, [productId, serviceId, quantity]);
+    return { product_id: productId, service_id: serviceId, quantity, id: result.id };
+};
+
+// Remove a Service from a Product
+const removeServiceFromProduct = async (productId, serviceId) => {
+    const sql = `DELETE FROM product_services WHERE product_id = ? AND service_id = ?`;
+    return await dbRun(sql, [productId, serviceId]);
+};
+
+// Get Services associated with a Product
+const getServicesForProduct = async (productId) => {
+    const sql = `
+        SELECT ps.service_id, ps.quantity, s.code, s.name, s.description, s.unit
+        FROM product_services ps
+        JOIN services s ON ps.service_id = s.id
+        WHERE ps.product_id = ?
+    `;
+    return await dbAll(sql, [productId]);
+};
+
+// --- Sub-Resources: Pricing Plans ---
 
 const getPlansByProductId = async (productId) => {
     const sql = `SELECT * FROM pricing_plans WHERE product_id = ?`;
@@ -84,7 +113,6 @@ const addPlanToProduct = async (productId, plan) => {
     return { id: result.id, product_id: productId, ...plan };
 };
 
-
 module.exports = {
     createProduct,
     getAllProducts,
@@ -93,5 +121,8 @@ module.exports = {
     updateProduct,
     deleteProduct,
     getPlansByProductId,
-    addPlanToProduct
+    addPlanToProduct,
+    addServiceToProduct,
+    removeServiceFromProduct,
+    getServicesForProduct
 };
