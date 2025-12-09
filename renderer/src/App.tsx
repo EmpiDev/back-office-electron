@@ -5,6 +5,9 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import JokesPage from '@/modules/jokes/pages/JokesPage'
 import DebugPage from '@/modules/debug/pages/DebugPage'
+import ProductsPage from '@/modules/products/pages/ProductsPage'
+import ServicesPage from '@/modules/services/pages/ServicesPage'
+import UsersPage from '@/modules/users/pages/UsersPage'
 import appConfig from '@/config/appConfig'
 
 function HomePage() {
@@ -54,6 +57,15 @@ function App() {
           <Button color="inherit" component={Link} to="/">
             {t('app.nav.home')}
           </Button>
+          <Button color="inherit" component={Link} to="/products">
+            {t('app.nav.products')}
+          </Button>
+          <Button color="inherit" component={Link} to="/services">
+            {t('app.nav.services')}
+          </Button>
+          <Button color="inherit" component={Link} to="/users">
+            {t('app.nav.users')}
+          </Button>
           <Button color="inherit" component={Link} to="/jokes">
             {t('app.nav.jokes')}
           </Button>
@@ -73,6 +85,9 @@ function App() {
       >
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/users" element={<UsersPage />} />
           <Route path="/jokes" element={<JokesPage />} />
           <Route path="/debug" element={<DebugPage />} />
         </Routes>

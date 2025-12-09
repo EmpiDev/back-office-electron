@@ -3,7 +3,10 @@
     "title": "My Electron App",
     "nav": {
       "home": "Home",
-      "jokes": "Jokes"
+      "jokes": "Jokes",
+      "products": "Products",
+      "services": "Services",
+      "users": "Users"
     }
   },
   "home": {
