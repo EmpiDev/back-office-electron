@@ -137,7 +137,7 @@ export default function ServicesPage() {
                 <TextField 
                     fullWidth 
                     variant="outlined" 
-                    placeholder="Rechercher un service..." 
+                    placeholder={t('services.searchPlaceholder')} 
                     size="small"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -186,9 +186,9 @@ export default function ServicesPage() {
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
-                                            label="Tags"
-                                            placeholder={allTags.length > 0 ? "Sélectionner des tags existants" : "Aucun tag disponible - créez-en dans la page Tags"}
-                                            helperText={allTags.length === 0 ? "Allez dans la page Tags pour créer des tags" : undefined}
+                                            label={t('services.tagsLabel')}
+                                            placeholder={allTags.length > 0 ? t('services.tagsPlaceholder') : t('services.noTagsAvailable')}
+                                            helperText={allTags.length === 0 ? t('services.goToTagsPage') : undefined}
                                         />
                                     )}
                                     renderTags={(value, getTagProps) =>
@@ -200,14 +200,14 @@ export default function ServicesPage() {
                                             />
                                         ))
                                     }
-                                    noOptionsText="Aucun tag disponible - créez-en dans la page Tags"
+                                    noOptionsText={t('services.noTagsAvailable')}
                                 />
                             </Grid>
                         </Grid>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setOpenDialog(false)}>Annuler</Button>
+                    <Button onClick={() => setOpenDialog(false)}>{t('common.cancel')}</Button>
                     <Button variant="contained" onClick={handleSaveService}>{editingServiceId ? t('common.save') : t('services.add')}</Button>
                 </DialogActions>
             </Dialog>

@@ -1,49 +1,76 @@
 {
-  "app": {
-    "title": "Mon App Electron",
-    "nav": {
-      "home": "Accueil",
-      "products": "Produits",
-      "services": "Services",
-      "users": "Utilisateurs"
+    "app": {
+        "title": "Mon App Electron",
+        "nav": {
+            "home": "Accueil",
+            "products": "Produits",
+            "services": "Services",
+            "users": "Utilisateurs"
+        }
+    },
+    "home": {
+        "title": "Accueil",
+        "description": "Ceci est ta page d'accueil.",
+        "counter": "Compteur: {{count}}"
+    },
+    "common": {
+        "refresh": "Actualiser",
+        "tag": "Tag",
+        "tags": "Tags",
+        "name": "Nom",
+        "delete": "Supprimer",
+        "actions": "Actions",
+        "noData": "Aucune donnée disponible",
+        "quantity": "Quantité",
+        "edit": "Modifier",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "price": "Prix",
+        "paymentType": "Type de paiement",
+        "description": "Description",
+        "unit": "unité"
+    },
+    "products": {
+        "title": "Gestion des Produits",
+        "addProduct": "Ajouter un Produit",
+        "add": "Ajouter",
+        "list": "Liste des Produits",
+        "selectServices": "Sélectionner les Services",
+        "searchPlaceholder": "Rechercher un produit...",
+        "priceEuro": "Prix (€)",
+        "paymentTypes": {
+            "oneTime": "En une fois",
+            "monthly": "Par mois"
+        },
+        "inheritedTags": "Tags (hérités des services sélectionnés)",
+        "noInheritedTags": "Aucun tag (sélectionnez des services pour voir les tags associés)"
+    },
+    "services": {
+        "title": "Gestion des Services",
+        "addService": "Ajouter un Service",
+        "add": "Ajouter",
+        "list": "Liste des Services",
+        "searchPlaceholder": "Rechercher un service...",
+        "tagsLabel": "Tags",
+        "tagsPlaceholder": "Sélectionner des tags existants",
+        "noTagsAvailable": "Aucun tag disponible - créez-en dans la page Tags",
+        "goToTagsPage": "Allez dans la page Tags pour créer des tags"
+    },
+    "users": {
+        "title": "Gestion des Utilisateurs",
+        "addUser": "Ajouter un Utilisateur",
+        "add": "Ajouter",
+        "list": "Liste des Utilisateurs",
+        "username": "Nom d'utilisateur",
+        "id": "ID",
+        "role": "Rôle"
+    },
+    "tags": {
+        "title": "Gestion des Tags",
+        "addTag": "Ajouter un Tag",
+        "add": "Ajouter",
+        "editTag": "Modifier le tag",
+        "searchPlaceholder": "Rechercher un tag...",
+        "nameLabel": "Nom du tag"
     }
-  },
-  "home": {
-    "title": "Accueil",
-    "description": "Ceci est ta page d'accueil.",
-    "counter": "Compteur: {{count}}"
-  },
-  "common": {
-    "refresh": "Actualiser",
-    "tag": "Tag",
-    "name": "Nom",
-    "delete": "Supprimer",
-    "actions": "Actions",
-    "noData": "Aucune donnée disponible",
-    "quantity": "Quantité",
-    "edit": "Modifier",
-    "save": "Enregistrer"
-  },
-  "products": {
-    "title": "Gestion des Produits",
-    "addProduct": "Ajouter un Produit",
-    "add": "Ajouter",
-    "list": "Liste des Produits",
-    "selectServices": "Sélectionner les Services"
-  },
-  "services": {
-    "title": "Gestion des Services",
-    "addService": "Ajouter un Service",
-    "add": "Ajouter",
-    "list": "Liste des Services"
-  },
-  "users": {
-    "title": "Gestion des Utilisateurs",
-    "addUser": "Ajouter un Utilisateur",
-    "add": "Ajouter",
-    "list": "Liste des Utilisateurs",
-    "username": "Nom d'utilisateur",
-    "id": "ID",
-    "role": "Rôle"
-  }
 }

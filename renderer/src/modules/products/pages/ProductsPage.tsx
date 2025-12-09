@@ -158,8 +158,8 @@ export default function ProductsPage() {
             )
         },
         { id: 'name', label: t('common.name') },
-        { id: 'price', label: 'Prix', format: (value, row) => `${value} €` },
-        { id: 'payment_type', label: 'Type de paiement', format: (value) => value === 'monthly' ? 'Par mois' : 'En une fois' },
+        { id: 'price', label: t('common.price'), format: (value, row) => `${value} €` },
+        { id: 'payment_type', label: t('common.paymentType'), format: (value) => value === 'monthly' ? t('products.paymentTypes.monthly') : t('products.paymentTypes.oneTime') },
         // { id: 'description', label: t('common.description') }, // Optional
     ];
 
@@ -201,7 +201,7 @@ export default function ProductsPage() {
                 <TextField 
                     fullWidth 
                     variant="outlined" 
-                    placeholder="Rechercher un produit..." 
+                    placeholder={t('products.searchPlaceholder')} 
                     size="small"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -239,7 +239,7 @@ export default function ProductsPage() {
                             </Grid>
                             <Grid size={{ xs: 6 }}>
                                 <TextField 
-                                    label="Prix (€)" 
+                                    label={t('products.priceEuro')} 
                                     type="number"
                                     value={newProduct.price} 
                                     onChange={e => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })} 
@@ -248,20 +248,20 @@ export default function ProductsPage() {
                             </Grid>
                             <Grid size={{ xs: 6 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Type de paiement</InputLabel>
+                                    <InputLabel>{t('common.paymentType')}</InputLabel>
                                     <Select
                                         value={newProduct.payment_type}
-                                        label="Type de paiement"
+                                        label={t('common.paymentType')}
                                         onChange={e => setNewProduct({ ...newProduct, payment_type: e.target.value })}
                                     >
-                                        <MenuItem value="one_time">En une fois</MenuItem>
-                                        <MenuItem value="monthly">Par mois</MenuItem>
+                                        <MenuItem value="one_time">{t('products.paymentTypes.oneTime')}</MenuItem>
+                                        <MenuItem value="monthly">{t('products.paymentTypes.monthly')}</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>
                             <Grid size={{ xs: 12 }}>
                                 <TextField 
-                                    label="Description" 
+                                    label={t('common.description')} 
                                     value={newProduct.description} 
                                     onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} 
                                     fullWidth 
@@ -299,7 +299,7 @@ export default function ProductsPage() {
                             ))}
                         </FormGroup>
 
-                        <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>Tags (hérités des services sélectionnés)</Typography>
+                        <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>{t('products.inheritedTags')}</Typography>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                             {selectedTagsInForm.length > 0 ? (
                                 allTags
@@ -314,7 +314,7 @@ export default function ProductsPage() {
                                     ))
                             ) : (
                                 <Typography variant="body2" color="text.secondary">
-                                    Aucun tag (sélectionnez des services pour voir les tags associés)
+                                    {t('products.noInheritedTags')}
                                 </Typography>
                             )}
                         </Box>
@@ -322,7 +322,7 @@ export default function ProductsPage() {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setOpenDialog(false)}>Annuler</Button>
+                    <Button onClick={() => setOpenDialog(false)}>{t('common.cancel')}</Button>
                     <Button variant="contained" onClick={handleSaveProduct}>{editingProductId ? t('common.save') : t('products.add')}</Button>
                 </DialogActions>
             </Dialog>

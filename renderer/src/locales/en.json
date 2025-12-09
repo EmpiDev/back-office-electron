@@ -1,49 +1,76 @@
 {
-  "app": {
-    "title": "My Electron App",
-    "nav": {
-      "home": "Home",
-      "products": "Products",
-      "services": "Services",
-      "users": "Users"
+    "app": {
+        "title": "My Electron App",
+        "nav": {
+            "home": "Home",
+            "products": "Products",
+            "services": "Services",
+            "users": "Users"
+        }
+    },
+    "home": {
+        "title": "Home",
+        "description": "This is your home page.",
+        "counter": "Counter: {{count}}"
+    },
+    "common": {
+        "refresh": "Refresh",
+        "tag": "Tag",
+        "tags": "Tags",
+        "name": "Name",
+        "delete": "Delete",
+        "actions": "Actions",
+        "noData": "No data available",
+        "quantity": "Quantity",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "price": "Price",
+        "paymentType": "Payment Type",
+        "description": "Description",
+        "unit": "unit"
+    },
+    "products": {
+        "title": "Products Management",
+        "addProduct": "Add Product",
+        "add": "Add Product",
+        "list": "Product List",
+        "selectServices": "Select Services",
+        "searchPlaceholder": "Search for a product...",
+        "priceEuro": "Price (€)",
+        "paymentTypes": {
+            "oneTime": "One-time",
+            "monthly": "Monthly"
+        },
+        "inheritedTags": "Tags (inherited from selected services)",
+        "noInheritedTags": "No tags (select services to see associated tags)"
+    },
+    "services": {
+        "title": "Services Management",
+        "addService": "Add Service",
+        "add": "Add Service",
+        "list": "Service List",
+        "searchPlaceholder": "Search for a service...",
+        "tagsLabel": "Tags",
+        "tagsPlaceholder": "Select existing tags",
+        "noTagsAvailable": "No tags available - create some in Tags page",
+        "goToTagsPage": "Go to Tags page to create tags"
+    },
+    "users": {
+        "title": "Users Management",
+        "addUser": "Add User",
+        "add": "Add User",
+        "list": "User List",
+        "username": "Username",
+        "id": "ID",
+        "role": "Role"
+    },
+    "tags": {
+        "title": "Tags Management",
+        "addTag": "Add Tag",
+        "add": "Add Tag",
+        "editTag": "Edit Tag",
+        "searchPlaceholder": "Search for a tag...",
+        "nameLabel": "Tag Name"
     }
-  },
-  "home": {
-    "title": "Home",
-    "description": "This is your home page.",
-    "counter": "Counter: {{count}}"
-  },
-  "common": {
-    "refresh": "Refresh",
-    "tag": "Tag",
-    "name": "Name",
-    "delete": "Delete",
-    "actions": "Actions",
-    "noData": "No data available",
-    "quantity": "Quantity",
-    "edit": "Edit",
-    "save": "Save"
-  },
-  "products": {
-    "title": "Products Management",
-    "addProduct": "Add Product",
-    "add": "Add Product",
-    "list": "Product List",
-    "selectServices": "Select Services"
-  },
-  "services": {
-    "title": "Services Management",
-    "addService": "Add Service",
-    "add": "Add Service",
-    "list": "Service List"
-  },
-  "users": {
-    "title": "Users Management",
-    "addUser": "Add User",
-    "add": "Add User",
-    "list": "User List",
-    "username": "Username",
-    "id": "ID",
-    "role": "Role"
-  }
 }

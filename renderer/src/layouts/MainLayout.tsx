@@ -10,9 +10,9 @@ export default function MainLayout() {
   const navItems = [
     { label: t('app.nav.home') || 'Home', path: '/' },
     { label: t('app.nav.products') || 'Products', path: '/products' },
-    { label: t('app.nav.services') || 'Services', path: '/services' },
-    { label: t('app.nav.users') || 'Users', path: '/users' },
+      { label: t('app.nav.services') || 'Services', path: '/services' },
     { label: 'Tags', path: '/tags' },
+    { label: t('app.nav.users') || 'Users', path: '/users' },
   ];
 
   const toggleLanguage = () => {

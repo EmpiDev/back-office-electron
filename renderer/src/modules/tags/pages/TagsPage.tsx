@@ -51,7 +51,7 @@ export default function TagsPage() {
     };
 
     const columns: Column<any>[] = [
-        { id: 'name', label: 'Nom du tag' },
+        { id: 'name', label: t('tags.nameLabel') },
     ];
 
     const filteredTags = tags.filter(t => 
@@ -61,13 +61,13 @@ export default function TagsPage() {
     return (
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Tags</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{t('tags.title')}</Typography>
                 <Button 
                     variant="contained" 
                     startIcon={<AddIcon />} 
                     onClick={handleOpenCreateDialog}
                 >
-                    Ajouter un tag
+                    {t('tags.addTag')}
                 </Button>
             </Box>
 
@@ -75,7 +75,7 @@ export default function TagsPage() {
                 <TextField 
                     fullWidth 
                     variant="outlined" 
-                    placeholder="Rechercher un tag..." 
+                    placeholder={t('tags.searchPlaceholder')} 
                     size="small"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -99,13 +99,13 @@ export default function TagsPage() {
             </Paper>
 
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>{editingTagId ? 'Modifier le tag' : 'Ajouter un tag'}</DialogTitle>
+                <DialogTitle>{editingTagId ? t('tags.editTag') : t('tags.addTag')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1 }}>
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12 }}>
                                 <TextField 
-                                    label="Nom du tag" 
+                                    label={t('tags.nameLabel')} 
                                     value={newTag.name} 
                                     onChange={e => setNewTag({ ...newTag, name: e.target.value })} 
                                     fullWidth 
@@ -116,9 +116,9 @@ export default function TagsPage() {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setOpenDialog(false)}>Annuler</Button>
+                    <Button onClick={() => setOpenDialog(false)}>{t('common.cancel')}</Button>
                     <Button variant="contained" onClick={handleSaveTag}>
-                        {editingTagId ? 'Sauvegarder' : 'Ajouter'}
+                        {editingTagId ? t('common.save') : t('tags.add')}
                     </Button>
                 </DialogActions>
             </Dialog>
