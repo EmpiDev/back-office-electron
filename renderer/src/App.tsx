@@ -37,7 +37,12 @@ function HomePage() {
 }
 
 function App() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'fr' ? 'en' : 'fr'
+    i18n.changeLanguage(newLang)
+  }
 
   return (
     <Box
@@ -67,6 +72,9 @@ function App() {
           </Button>
           <Button color="inherit" component={Link} to="/debug">
             Debug DB
+          </Button>
+          <Button color="inherit" onClick={toggleLanguage} sx={{ ml: 2, border: '1px solid rgba(255,255,255,0.3)' }}>
+            {i18n.language === 'fr' ? 'EN' : 'FR'}
           </Button>
         </Toolbar>
       </AppBar>
