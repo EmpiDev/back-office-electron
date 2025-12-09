@@ -7,7 +7,7 @@ export default function ProductsPage() {
     const [products, setProducts] = useState<any[]>([]);
     const [newProduct, setNewProduct] = useState({ code: '', name: '', description: '', target_segment: '', is_highlighted: false });
 
-    useEffect(() => {ù
+    useEffect(() => {
         loadData();
     }, []);
 
