@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, FormGroup, FormControlLabel, Chip } from '@mui/material';
-import { Add as AddIcon, Search as SearchIcon, CloudDownload as DownloadIcon } from '@mui/icons-material';
+import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, FormGroup, FormControlLabel, Chip, IconButton, Tooltip } from '@mui/material';
+import { Add as AddIcon, Search as SearchIcon, CloudDownload as DownloadIcon, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import DataTable, { Column } from '@/modules/shared/components/DataTable/DataTable';
 
@@ -145,6 +145,17 @@ export default function ProductsPage() {
         loadData();
     };
 
+    const handleToggleTopProduct = async (product: any) => {
+        const updatedProduct = { 
+            ...product, 
+            is_top_product: !product.is_top_product,
+            // Ensure boolean fields are properly typed/converted if necessary, though direct spread works for known structure
+        };
+        // The backend expects boolean for is_top_product, handled by updateProduct
+        await window.electronApi.updateProduct(product.id, updatedProduct);
+        loadData();
+    };
+
     const columns: Column<any>[] = [
         { 
             id: 'tags', 
@@ -155,6 +166,20 @@ export default function ProductsPage() {
                         <Chip key={tag.id} label={tag.name} size="small" variant="outlined" />
                     ))}
                 </Box>
+            )
+        },
+        {
+            id: 'is_top_product',
+            label: t('products.topProduct'),
+            render: (row) => (
+                <Tooltip title={row.is_top_product ? t('products.removeTopProduct') : t('products.addTopProduct')}>
+                    <IconButton 
+                        onClick={(e) => { e.stopPropagation(); handleToggleTopProduct(row); }}
+                        color={row.is_top_product ? "warning" : "default"}
+                    >
+                        {row.is_top_product ? <StarIcon /> : <StarBorderIcon />}
+                    </IconButton>
+                </Tooltip>
             )
         },
         { id: 'name', label: t('common.name') },

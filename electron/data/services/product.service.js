@@ -4,15 +4,11 @@ const { dbRun, dbGet, dbAll } = require('../db-helper');
 
 // Create Product
 const createProduct = async (product) => {
-    // Generate a unique legacy tag if not provided to satisfy DB constraint
-    const legacyTag = product.tag || `prod_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-
     const sql = `
-        INSERT INTO products (tag, name, description, target_segment, is_in_carousel, is_top_product, price, payment_type)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO products (name, description, target_segment, is_in_carousel, is_top_product, price, payment_type)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
     const result = await dbRun(sql, [
-        legacyTag,
         product.name,
         product.description,
         product.target_segment,
@@ -21,7 +17,7 @@ const createProduct = async (product) => {
         product.price,
         product.payment_type
     ]);
-    return { id: result.id, ...product, tag: legacyTag };
+    return { id: result.id, ...product };
 };
 
 // Read All Products

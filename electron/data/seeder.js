@@ -12,14 +12,13 @@ const initialData = {
         { name: 'Training', description: 'Professional training and workshops' }
     ],
     services: [
-        { tag: 'SRV-SUP-L1', name: 'Level 1 Support', description: 'Basic email support', unit: 'Ticket', category_name: 'Support' },
-        { tag: 'SRV-AUDIT-SEC', name: 'Security Audit', description: 'Full infrastructure audit', unit: 'Day', category_name: 'Security' },
-        { tag: 'SRV-DEV-WEB', name: 'Web Development', description: 'React/Node development', unit: 'Day', category_name: 'Development' },
-        { tag: 'SRV-SOC-MON', name: 'SOC Monitoring', description: '24/7 Security Monitoring', unit: 'Month', category_name: 'Security' }
+        { name: 'Level 1 Support', description: 'Basic email support', unit: 'Ticket', category_name: 'Support', tags: ['Support', 'Business Hours'] },
+        { name: 'Security Audit', description: 'Full infrastructure audit', unit: 'Day', category_name: 'Security', tags: ['Security', 'Audit', 'Compliance'] },
+        { name: 'Web Development', description: 'React/Node development', unit: 'Day', category_name: 'Development', tags: ['Development', 'Web'] },
+        { name: 'SOC Monitoring', description: '24/7 Security Monitoring', unit: 'Month', category_name: 'Security', tags: ['Security', 'Monitoring', 'SIEM', '24/7'] }
     ],
     products: [
         {
-            tag: 'PRD-AUDIT-PACK',
             name: 'Audit Pack',
             description: 'Complete security assessment',
             target_segment: 'SME',
@@ -28,12 +27,11 @@ const initialData = {
             price: 5000,
             payment_type: 'one_time',
             services: [
-                { tag: 'SRV-AUDIT-SEC', quantity: 5 } // Volume: 5 Days of audit
+                { name: 'Security Audit', quantity: 5 } // Volume: 5 Days of audit
             ],
             tags: ['Security', 'Compliance', 'SME', 'On-Premise']
         },
         {
-            tag: 'PRD-SOC-YEAR',
             name: 'Managed SOC',
             description: 'Yearly SOC subscription',
             target_segment: 'Enterprise',
@@ -42,13 +40,12 @@ const initialData = {
             price: 2000,
             payment_type: 'monthly',
             services: [
-                { tag: 'SRV-SOC-MON', quantity: 12 }, // Volume: 12 Months
-                { tag: 'SRV-SUP-L1', quantity: 100 }  // Volume: 100 Tickets included
+                { name: 'SOC Monitoring', quantity: 12 }, // Volume: 12 Months
+                { name: 'Level 1 Support', quantity: 100 }  // Volume: 100 Tickets included
             ],
             tags: ['Security', '24/7', 'Enterprise', 'Cloud', 'Monitoring']
         },
         {
-            tag: 'PRD-DEV-START',
             name: 'Startup Dev Pack',
             description: 'Full stack development team for 1 month',
             target_segment: 'Startup',
@@ -57,7 +54,7 @@ const initialData = {
             price: 15000,
             payment_type: 'one_time',
             services: [
-                { tag: 'SRV-DEV-WEB', quantity: 20 }
+                { name: 'Web Development', quantity: 20 }
             ],
             tags: ['Startup', 'Development', 'Web']
         }
@@ -87,7 +84,13 @@ const initialData = {
         // Technology
         { name: 'SIEM' },
         { name: 'EDR' },
-        { name: 'Firewall' }
+        { name: 'Firewall' },
+
+        // Functional Domains
+        { name: 'Development' },
+        { name: 'Web' },
+        { name: 'Support' },
+        { name: 'Audit' }
     ]
 };
 
@@ -132,14 +135,14 @@ function seedDatabase(db) {
 
             // Services
             for (const srv of initialData.services) {
-                const exists = await get("SELECT id FROM services WHERE tag = ?", [srv.tag]);
+                const exists = await get("SELECT id FROM services WHERE name = ?", [srv.name]);
                 if (!exists) {
                     const cat = await get("SELECT id FROM categories WHERE name = ?", [srv.category_name]);
                     const catId = cat ? cat.id : null;
 
-                    await run("INSERT INTO services (tag, name, description, unit, category_id) VALUES (?, ?, ?, ?, ?)",
-                        [srv.tag, srv.name, srv.description, srv.unit, catId]);
-                    console.log(`Service seeded: ${srv.tag}`);
+                    await run("INSERT INTO services (name, description, unit, category_id) VALUES (?, ?, ?, ?)",
+                        [srv.name, srv.description, srv.unit, catId]);
+                    console.log(`Service seeded: ${srv.name}`);
                 }
             }
 
@@ -152,25 +155,46 @@ function seedDatabase(db) {
                 }
             }
 
+            // Service Tags (Seed links between services and tags)
+            // We run this after Services and Tags are guaranteed to exist
+            for (const srv of initialData.services) {
+                if (srv.tags) {
+                    const service = await get("SELECT id FROM services WHERE name = ?", [srv.name]);
+                    if (service) {
+                        for (const tagName of srv.tags) {
+                            const tag = await get("SELECT id FROM tags WHERE name = ?", [tagName]);
+                            if (tag) {
+                                // Check if link exists
+                                const linkExists = await get("SELECT * FROM service_tags WHERE service_id = ? AND tag_id = ?", [service.id, tag.id]);
+                                if (!linkExists) {
+                                    await run("INSERT INTO service_tags (service_id, tag_id) VALUES (?, ?)", [service.id, tag.id]);
+                                    console.log(`   -> Linked service ${srv.name} to tag ${tagName}`);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Products
             for (const prod of initialData.products) {
                 let prodId;
-                const existingProd = await get("SELECT id FROM products WHERE tag = ?", [prod.tag]);
+                const existingProd = await get("SELECT id FROM products WHERE name = ?", [prod.name]);
 
                 if (!existingProd) {
-                    const result = await run("INSERT INTO products (tag, name, description, target_segment, is_in_carousel, is_top_product, price, payment_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                        [prod.tag, prod.name, prod.description, prod.target_segment, prod.is_in_carousel, prod.is_top_product, prod.price, prod.payment_type]);
+                    const result = await run("INSERT INTO products (name, description, target_segment, is_in_carousel, is_top_product, price, payment_type) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        [prod.name, prod.description, prod.target_segment, prod.is_in_carousel, prod.is_top_product, prod.price, prod.payment_type]);
                     prodId = result.lastID;
-                    console.log(`Product seeded: ${prod.tag}`);
+                    console.log(`Product seeded: ${prod.name}`);
 
                     // Seed Product-Services (Volume)
                     if (prod.services) {
                         for (const prodSrv of prod.services) {
-                            const service = await get("SELECT id FROM services WHERE tag = ?", [prodSrv.tag]);
+                            const service = await get("SELECT id FROM services WHERE name = ?", [prodSrv.name]);
                             if (service) {
                                 await run("INSERT INTO product_services (product_id, service_id, quantity) VALUES (?, ?, ?)",
                                     [prodId, service.id, prodSrv.quantity]);
-                                console.log(`   -> Linked service ${prodSrv.tag} (Qty: ${prodSrv.quantity})`);
+                                console.log(`   -> Linked service ${prodSrv.name} (Qty: ${prodSrv.quantity})`);
                             }
                         }
                     }

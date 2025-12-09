@@ -45,7 +45,10 @@
             "monthly": "Monthly"
         },
         "inheritedTags": "Tags (inherited from selected services)",
-        "noInheritedTags": "No tags (select services to see associated tags)"
+        "noInheritedTags": "No tags (select services to see associated tags)",
+        "topProduct": "Top Product",
+        "addTopProduct": "Add to Top Products",
+        "removeTopProduct": "Remove from Top Products"
     },
     "services": {
         "title": "Services Management",

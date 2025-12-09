@@ -45,7 +45,10 @@
             "monthly": "Par mois"
         },
         "inheritedTags": "Tags (hérités des services sélectionnés)",
-        "noInheritedTags": "Aucun tag (sélectionnez des services pour voir les tags associés)"
+        "noInheritedTags": "Aucun tag (sélectionnez des services pour voir les tags associés)",
+        "topProduct": "Top Produit",
+        "addTopProduct": "Ajouter aux Top Produits",
+        "removeTopProduct": "Retirer des Top Produits"
     },
     "services": {
         "title": "Gestion des Services",
