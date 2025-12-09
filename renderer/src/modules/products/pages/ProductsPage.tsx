@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, FormGroup, FormControlLabel } from '@mui/material';
+import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, FormGroup, FormControlLabel, Chip } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon, CloudDownload as DownloadIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import DataTable, { Column } from '@/modules/shared/components/DataTable/DataTable';
@@ -8,27 +8,57 @@ export default function ProductsPage() {
     const { t } = useTranslation();
     const [products, setProducts] = useState<any[]>([]);
     const [allServices, setAllServices] = useState<any[]>([]); // New state for all available services
+    const [allTags, setAllTags] = useState<any[]>([]); // State for all available tags
     const [openDialog, setOpenDialog] = useState(false);
     const [newProduct, setNewProduct] = useState<any>({ tag: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Updated fields
     const [selectedServicesInForm, setSelectedServicesInForm] = useState<Array<{ serviceId: number; quantity: number }>>([]); // New state for selected services
+    const [selectedTagsInForm, setSelectedTagsInForm] = useState<number[]>([]); // State for selected tags (now auto-calculated)
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+
+    // Automatic tag inheritance from selected services
+    useEffect(() => {
+        const fetchServiceTags = async () => {
+            const allServiceTags = new Set<number>();
+            for (const { serviceId } of selectedServicesInForm) {
+                const tags = await window.electronApi.getTagsForService(serviceId);
+                tags.forEach(tag => tag.id && allServiceTags.add(tag.id));
+            }
+            setSelectedTagsInForm(Array.from(allServiceTags));
+        };
+        
+        if (selectedServicesInForm.length > 0) {
+            fetchServiceTags();
+        } else {
+            setSelectedTagsInForm([]);
+        }
+    }, [selectedServicesInForm]);
 
     useEffect(() => {
         loadData();
     }, []);
 
     const loadData = async () => {
-        const p = await window.electronApi.getProducts();
-        setProducts(p);
+        const rawProducts = await window.electronApi.getProducts();
+        
+        // Fetch tags for each product
+        const productsWithTags = await Promise.all(rawProducts.map(async (product: any) => {
+            const tags = await window.electronApi.getTagsForProduct(product.id);
+            return { ...product, tags };
+        }));
+
+        setProducts(productsWithTags);
         const s = await window.electronApi.getServices(); // Fetch all services
         setAllServices(s);
+        const tags = await window.electronApi.getTags(); // Fetch all tags
+        setAllTags(tags);
     };
 
     const handleOpenCreateDialog = () => {
         setEditingProductId(null);
         setNewProduct({ tag: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' });
         setSelectedServicesInForm([]);
+        setSelectedTagsInForm([]);
         setOpenDialog(true);
     };
 
@@ -49,6 +79,10 @@ export default function ProductsPage() {
         const services = await window.electronApi.getServicesForProduct(product.id);
         setSelectedServicesInForm(services.map(s => ({ serviceId: s.service_id, quantity: s.quantity })));
         
+        // Load associated tags
+        const tags = await window.electronApi.getTagsForProduct(product.id);
+        setSelectedTagsInForm(tags.map((t: any) => t.id));
+        
         setOpenDialog(true);
     };
 
@@ -63,6 +97,23 @@ export default function ProductsPage() {
                      await window.electronApi.removeServiceFromProduct(editingProductId, s.service_id);
                  }
              }
+             
+             // Update tag associations
+             const currentTags = await window.electronApi.getTagsForProduct(editingProductId);
+             
+             // Remove tags that are no longer selected
+             for (const tag of currentTags) {
+                 if (tag.id && !selectedTagsInForm.includes(tag.id)) {
+                     await window.electronApi.removeTagFromProduct(editingProductId, tag.id);
+                 }
+             }
+             
+             // Add newly selected tags
+             for (const tagId of selectedTagsInForm) {
+                 if (!currentTags.find((t: any) => t.id === tagId)) {
+                     await window.electronApi.addTagToProduct(editingProductId, tagId);
+                 }
+             }
         } else {
              savedProduct = await window.electronApi.createProduct(newProduct);
         }
@@ -74,8 +125,16 @@ export default function ProductsPage() {
             await window.electronApi.addServiceToProduct(productId!, selectedService.serviceId, selectedService.quantity);
         }
         
+        // Add tags to new product
+        if (savedProduct && savedProduct.id) {
+            for (const tagId of selectedTagsInForm) {
+                await window.electronApi.addTagToProduct(savedProduct.id, tagId);
+            }
+        }
+        
         setNewProduct({ tag: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Reset form
         setSelectedServicesInForm([]); // Reset selected services
+        setSelectedTagsInForm([]); // Reset selected tags
         setEditingProductId(null);
         setOpenDialog(false);
         loadData();
@@ -87,7 +146,17 @@ export default function ProductsPage() {
     };
 
     const columns: Column<any>[] = [
-        { id: 'tag', label: t('common.tag') },
+        { 
+            id: 'tags', 
+            label: t('common.tag'),
+            render: (row) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {row.tags && row.tags.map((tag: any) => (
+                        <Chip key={tag.id} label={tag.name} size="small" variant="outlined" />
+                    ))}
+                </Box>
+            )
+        },
         { id: 'name', label: t('common.name') },
         { id: 'price', label: 'Prix', format: (value, row) => `${value} €` },
         { id: 'payment_type', label: 'Type de paiement', format: (value) => value === 'monthly' ? 'Par mois' : 'En une fois' },
@@ -162,14 +231,6 @@ export default function ProductsPage() {
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12 }}>
                                 <TextField 
-                                    label={t('common.tag')} 
-                                    value={newProduct.tag} 
-                                    onChange={e => setNewProduct({ ...newProduct, tag: e.target.value })} 
-                                    fullWidth 
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12 }}>
-                                <TextField 
                                     label={t('common.name')} 
                                     value={newProduct.name} 
                                     onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} 
@@ -237,6 +298,26 @@ export default function ProductsPage() {
                                 </Box>
                             ))}
                         </FormGroup>
+
+                        <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>Tags (hérités des services sélectionnés)</Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            {selectedTagsInForm.length > 0 ? (
+                                allTags
+                                    .filter(tag => tag.id && selectedTagsInForm.includes(tag.id))
+                                    .map(tag => (
+                                        <Chip
+                                            key={tag.id}
+                                            label={tag.name}
+                                            color="primary"
+                                            variant="outlined"
+                                        />
+                                    ))
+                            ) : (
+                                <Typography variant="body2" color="text.secondary">
+                                    Aucun tag (sélectionnez des services pour voir les tags associés)
+                                </Typography>
+                            )}
+                        </Box>
 
                     </Box>
                 </DialogContent>

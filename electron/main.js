@@ -7,6 +7,7 @@ const { initDB } = require("./data/database");
 const userService = require('./data/services/user.service');
 const serviceService = require('./data/services/service.service');
 const productService = require('./data/services/product.service');
+const tagService = require('./data/services/tag.service');
 
 const APP_NAME = "Mon app";
 
@@ -109,6 +110,42 @@ ipcMain.handle('products:get-plans', async (_event, productId) => {
 });
 ipcMain.handle('products:add-plan', async (_event, productId, plan) => {
     return await productService.addPlanToProduct(productId, plan);
+});
+
+// Tags
+ipcMain.handle('tags:get-all', async () => {
+    return await tagService.getAllTags();
+});
+ipcMain.handle('tags:create', async (_event, tag) => {
+    return await tagService.createTag(tag);
+});
+ipcMain.handle('tags:update', async (_event, id, tag) => {
+    return await tagService.updateTag(id, tag);
+});
+ipcMain.handle('tags:delete', async (_event, id) => {
+    return await tagService.deleteTag(id);
+});
+
+// Tag-Service relationships
+ipcMain.handle('tags:get-for-service', async (_event, serviceId) => {
+    return await tagService.getTagsForService(serviceId);
+});
+ipcMain.handle('tags:add-to-service', async (_event, serviceId, tagId) => {
+    return await tagService.addTagToService(serviceId, tagId);
+});
+ipcMain.handle('tags:remove-from-service', async (_event, serviceId, tagId) => {
+    return await tagService.removeTagFromService(serviceId, tagId);
+});
+
+// Tag-Product relationships
+ipcMain.handle('tags:get-for-product', async (_event, productId) => {
+    return await tagService.getTagsForProduct(productId);
+});
+ipcMain.handle('tags:add-to-product', async (_event, productId, tagId) => {
+    return await tagService.addTagToProduct(productId, tagId);
+});
+ipcMain.handle('tags:remove-from-product', async (_event, productId, tagId) => {
+    return await tagService.removeTagFromProduct(productId, tagId);
 });
 
 

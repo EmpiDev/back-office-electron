@@ -12,6 +12,7 @@ export default function MainLayout() {
     { label: t('app.nav.products') || 'Products', path: '/products' },
     { label: t('app.nav.services') || 'Services', path: '/services' },
     { label: t('app.nav.users') || 'Users', path: '/users' },
+    { label: 'Tags', path: '/tags' },
   ];
 
   const toggleLanguage = () => {

@@ -4,21 +4,24 @@ const { dbRun, dbGet, dbAll } = require('../db-helper');
 
 // Create Product
 const createProduct = async (product) => {
+    // Generate a unique legacy tag if not provided to satisfy DB constraint
+    const legacyTag = product.tag || `prod_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
     const sql = `
         INSERT INTO products (tag, name, description, target_segment, is_in_carousel, is_top_product, price, payment_type)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const result = await dbRun(sql, [
-        product.tag, 
-        product.name, 
-        product.description, 
-        product.target_segment, 
+        legacyTag,
+        product.name,
+        product.description,
+        product.target_segment,
         product.is_in_carousel ? 1 : 0,
         product.is_top_product ? 1 : 0,
         product.price,
         product.payment_type
     ]);
-    return { id: result.id, ...product };
+    return { id: result.id, ...product, tag: legacyTag };
 };
 
 // Read All Products
@@ -33,24 +36,17 @@ const getProductById = async (id) => {
     return await dbGet(sql, [id]);
 };
 
-// Read One Product by Tag
-const getProductByTag = async (tag) => {
-    const sql = `SELECT * FROM products WHERE tag = ?`;
-    return await dbGet(sql, [tag]);
-};
-
 // Update Product
 const updateProduct = async (id, product) => {
     const sql = `
         UPDATE products
-        SET tag = ?, name = ?, description = ?, target_segment = ?, is_in_carousel = ?, is_top_product = ?, price = ?, payment_type = ?, updated_at = CURRENT_TIMESTAMP
+        SET name = ?, description = ?, target_segment = ?, is_in_carousel = ?, is_top_product = ?, price = ?, payment_type = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
     `;
     await dbRun(sql, [
-        product.tag, 
-        product.name, 
-        product.description, 
-        product.target_segment, 
+        product.name,
+        product.description,
+        product.target_segment,
         product.is_in_carousel ? 1 : 0,
         product.is_top_product ? 1 : 0,
         product.price,
@@ -121,7 +117,6 @@ module.exports = {
     createProduct,
     getAllProducts,
     getProductById,
-    getProductByTag,
     updateProduct,
     deleteProduct,
     getPlansByProductId,

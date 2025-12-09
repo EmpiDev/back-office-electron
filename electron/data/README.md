@@ -12,6 +12,7 @@ Ce dossier contient la couche d'accès aux données de l'application Back-Office
     - `product.service.js` : Gestion des produits commerciaux.
     - `service.service.js` : Gestion des services unitaires (briques métier).
     - `user.service.js` : Gestion des utilisateurs et de l'authentification.
+    - `tag.service.js` : Gestion des tags et de leurs associations avec les services et produits.
 
 ## Modèle de Données Principal
 
@@ -33,6 +34,16 @@ Table : `users`
 - `username`
 - `password_hash`
 - `role` ('admin', 'user')
+
+### Tags
+Table : `tags`
+- `name` : Nom unique du tag (ex: "Cloud", "Security", "24/7")
+
+**Tables de jointure :**
+- `service_tags` : Association many-to-many entre services et tags
+- `product_tags` : Association many-to-many entre produits et tags
+
+**Utilité :** Les tags permettent de catégoriser et filtrer les services et produits selon différents critères (type de déploiement, niveau de service, segment cible, catégorie, technologie, etc.).
 
 ## Utilisation
 

@@ -5,6 +5,7 @@ import DashboardPage from '@/modules/dashboard/pages/DashboardPage'
 import ProductsPage from '@/modules/products/pages/ProductsPage'
 import ServicesPage from '@/modules/services/pages/ServicesPage'
 import UsersPage from '@/modules/users/pages/UsersPage'
+import TagsPage from '@/modules/tags/pages/TagsPage'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="products" element={<ProductsPage />} />
         <Route path="services" element={<ServicesPage />} />
         <Route path="users" element={<UsersPage />} />
+        <Route path="tags" element={<TagsPage />} />
       </Route>
     </Routes>
   )

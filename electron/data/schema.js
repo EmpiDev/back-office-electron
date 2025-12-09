@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS categories (
 -- C’est la “brique fonctionnelle” de base, sans notion commerciale directe (pas de prix ici).
 CREATE TABLE IF NOT EXISTS services (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    -- [DEPRECATED] Legacy unique identifier, kept for DB compatibility. Now auto-generated.
     tag TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     description TEXT,
@@ -39,6 +40,7 @@ CREATE TABLE IF NOT EXISTS services (
 -- C'est ce que l'on vend au client.
 CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    -- [DEPRECATED] Legacy unique identifier, kept for DB compatibility. Now auto-generated.
     tag TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     description TEXT,

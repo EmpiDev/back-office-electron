@@ -4,12 +4,15 @@ const { dbRun, dbGet, dbAll } = require('../db-helper');
 
 // Create
 const createService = async (service) => {
+    // Generate a unique legacy tag if not provided to satisfy DB constraint
+    const legacyTag = service.tag || `srv_${Date.now()}_${Math.floor(Math.random() * 1000)} `;
+
     const sql = `
-        INSERT INTO services (tag, name, description, unit, category_id)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO services(tag, name, description, unit, category_id)
+VALUES(?, ?, ?, ?, ?)
     `;
-    const result = await dbRun(sql, [service.tag, service.name, service.description, service.unit, service.category_id]);
-    return { id: result.id, ...service };
+    const result = await dbRun(sql, [legacyTag, service.name, service.description, service.unit, service.category_id]);
+    return { id: result.id, ...service, tag: legacyTag };
 };
 
 // Read (All) - Avec jointure optionnelle pour récupérer le nom de la catégorie
@@ -33,26 +36,20 @@ const getServiceById = async (id) => {
     return await dbGet(sql, [id]);
 };
 
-// Read (By Tag)
-const getServiceByTag = async (tag) => {
-    const sql = `SELECT * FROM services WHERE tag = ?`;
-    return await dbGet(sql, [tag]);
-};
-
 // Update
 const updateService = async (id, service) => {
     const sql = `
         UPDATE services
-        SET tag = ?, name = ?, description = ?, unit = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP
+        SET name = ?, description = ?, unit = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
     `;
-    await dbRun(sql, [service.tag, service.name, service.description, service.unit, service.category_id, id]);
+    await dbRun(sql, [service.name, service.description, service.unit, service.category_id, id]);
     return await getServiceById(id);
 };
 
 // Delete
 const deleteService = async (id) => {
-    const sql = `DELETE FROM services WHERE id = ?`;
+    const sql = `DELETE FROM services WHERE id = ? `;
     return await dbRun(sql, [id]);
 };
 
@@ -60,7 +57,6 @@ module.exports = {
     createService,
     getAllServices,
     getServiceById,
-    getServiceByTag,
     updateService,
     deleteService
 };

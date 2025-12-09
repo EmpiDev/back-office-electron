@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment } from '@mui/material';
+import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, Autocomplete, Chip } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import DataTable, { Column } from '@/modules/shared/components/DataTable/DataTable';
@@ -7,8 +7,10 @@ import DataTable, { Column } from '@/modules/shared/components/DataTable/DataTab
 export default function ServicesPage() {
     const { t } = useTranslation();
     const [services, setServices] = useState<any[]>([]);
+    const [allTags, setAllTags] = useState<any[]>([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [newService, setNewService] = useState({ tag: '', name: '', description: '', category_id: null });
+    const [selectedTagsInForm, setSelectedTagsInForm] = useState<number[]>([]);
     const [editingServiceId, setEditingServiceId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -17,17 +19,27 @@ export default function ServicesPage() {
     }, []);
 
     const loadData = async () => {
-        const s = await window.electronApi.getServices();
-        setServices(s);
+        const rawServices = await window.electronApi.getServices();
+        
+        // Fetch tags for each service
+        const servicesWithTags = await Promise.all(rawServices.map(async (service: any) => {
+            const tags = await window.electronApi.getTagsForService(service.id);
+            return { ...service, tags };
+        }));
+
+        setServices(servicesWithTags);
+        const tags = await window.electronApi.getTags();
+        setAllTags(tags);
     };
 
     const handleOpenCreateDialog = () => {
         setEditingServiceId(null);
         setNewService({ tag: '', name: '', description: '', category_id: null });
+        setSelectedTagsInForm([]);
         setOpenDialog(true);
     };
 
-    const handleEditService = (service: any) => {
+    const handleEditService = async (service: any) => {
         setEditingServiceId(service.id);
         setNewService({
             tag: service.tag,
@@ -35,16 +47,49 @@ export default function ServicesPage() {
             description: service.description || '',
             category_id: service.category_id
         });
+        
+        // Tags are already in the service object now, but we use the API to be safe/consistent
+        // or just use service.tags if we trust loadData is fresh
+        const tags = await window.electronApi.getTagsForService(service.id);
+        setSelectedTagsInForm(tags.map((t: any) => t.id));
+        
         setOpenDialog(true);
     };
 
     const handleSaveService = async () => {
+        let savedService;
         if (editingServiceId) {
-            await window.electronApi.updateService(editingServiceId, newService);
+            savedService = await window.electronApi.updateService(editingServiceId, newService);
+            
+            // Update tag associations
+            const currentTags = await window.electronApi.getTagsForService(editingServiceId);
+            
+            // Remove tags that are no longer selected
+            for (const tag of currentTags) {
+                if (tag.id && !selectedTagsInForm.includes(tag.id)) {
+                    await window.electronApi.removeTagFromService(editingServiceId, tag.id);
+                }
+            }
+            
+            // Add newly selected tags
+            for (const tagId of selectedTagsInForm) {
+                if (!currentTags.find((t: any) => t.id === tagId)) {
+                    await window.electronApi.addTagToService(editingServiceId, tagId);
+                }
+            }
         } else {
-            await window.electronApi.createService(newService);
+            savedService = await window.electronApi.createService(newService);
+            
+            // Add tags to new service
+            if (savedService && savedService.id) {
+                for (const tagId of selectedTagsInForm) {
+                    await window.electronApi.addTagToService(savedService.id, tagId);
+                }
+            }
         }
+        
         setNewService({ tag: '', name: '', description: '', category_id: null });
+        setSelectedTagsInForm([]);
         setEditingServiceId(null);
         setOpenDialog(false);
         loadData();
@@ -56,7 +101,17 @@ export default function ServicesPage() {
     };
 
     const columns: Column<any>[] = [
-        { id: 'tag', label: t('common.tag') },
+        { 
+            id: 'tags', 
+            label: t('common.tag'),
+            render: (row) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {row.tags && row.tags.map((tag: any) => (
+                        <Chip key={tag.id} label={tag.name} size="small" variant="outlined" />
+                    ))}
+                </Box>
+            )
+        },
         { id: 'name', label: t('common.name') },
     ];
 
@@ -112,18 +167,40 @@ export default function ServicesPage() {
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12 }}>
                                 <TextField 
-                                    label={t('common.tag')} 
-                                    value={newService.tag} 
-                                    onChange={e => setNewService({ ...newService, tag: e.target.value })} 
-                                    fullWidth 
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12 }}>
-                                <TextField 
                                     label={t('common.name')} 
                                     value={newService.name} 
                                     onChange={e => setNewService({ ...newService, name: e.target.value })} 
                                     fullWidth 
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12 }}>
+                                <Autocomplete
+                                    multiple
+                                    freeSolo={false}
+                                    options={allTags}
+                                    getOptionLabel={(option) => option.name}
+                                    value={allTags.filter(tag => tag.id && selectedTagsInForm.includes(tag.id))}
+                                    onChange={(_, newValue) => {
+                                        setSelectedTagsInForm(newValue.map(tag => tag.id).filter((id): id is number => id !== undefined));
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Tags"
+                                            placeholder={allTags.length > 0 ? "Sélectionner des tags existants" : "Aucun tag disponible - créez-en dans la page Tags"}
+                                            helperText={allTags.length === 0 ? "Allez dans la page Tags pour créer des tags" : undefined}
+                                        />
+                                    )}
+                                    renderTags={(value, getTagProps) =>
+                                        value.map((option, index) => (
+                                            <Chip
+                                                label={option.name}
+                                                {...getTagProps({ index })}
+                                                key={option.id}
+                                            />
+                                        ))
+                                    }
+                                    noOptionsText="Aucun tag disponible - créez-en dans la page Tags"
                                 />
                             </Grid>
                         </Grid>

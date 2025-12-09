@@ -45,6 +45,12 @@ export interface PricingPlan {
   updated_at?: string;
 }
 
+export interface Tag {
+  id?: number;
+  name: string;
+  created_at?: string;
+}
+
 declare global {
   interface ElectronApi {
     ping: () => Promise<unknown>
@@ -79,6 +85,22 @@ declare global {
     // Pricing Plans
     getPlansByProductId: (productId: number) => Promise<PricingPlan[]>;
     addPlanToProduct: (productId: number, plan: PricingPlan) => Promise<PricingPlan>;
+
+    // Tags
+    getTags: () => Promise<Tag[]>;
+    createTag: (tag: Tag) => Promise<Tag>;
+    updateTag: (id: number, tag: Tag) => Promise<Tag>;
+    deleteTag: (id: number) => Promise<void>;
+    
+    // Tag-Service relationships
+    getTagsForService: (serviceId: number) => Promise<Tag[]>;
+    addTagToService: (serviceId: number, tagId: number) => Promise<any>;
+    removeTagFromService: (serviceId: number, tagId: number) => Promise<void>;
+    
+    // Tag-Product relationships
+    getTagsForProduct: (productId: number) => Promise<Tag[]>;
+    addTagToProduct: (productId: number, tagId: number) => Promise<any>;
+    removeTagFromProduct: (productId: number, tagId: number) => Promise<void>;
   }
 
   interface Window {
