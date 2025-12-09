@@ -4,7 +4,9 @@
         "nav": {
             "home": "Accueil",
             "products": "Produits",
+            "showcase": "Mise en avant",
             "services": "Services",
+            "categories": "Catégories",
             "users": "Utilisateurs"
         }
     },
@@ -72,5 +74,16 @@
         "editTag": "Modifier le tag",
         "searchPlaceholder": "Rechercher un tag...",
         "nameLabel": "Nom du tag"
+    },
+    "categories": {
+        "title": "Gestion des Catégories",
+        "addCategory": "Ajouter une Catégorie",
+        "searchPlaceholder": "Rechercher une catégorie..."
+    },
+    "showcase": {
+        "title": "Mise en avant",
+        "carousel": "Carrousel",
+        "topProducts": "Top Produits",
+        "availableProducts": "Produits Disponibles"
     }
 }

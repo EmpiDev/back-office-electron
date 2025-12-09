@@ -9,11 +9,11 @@ export default function MainLayout() {
 
   const navItems = [
     { label: t('app.nav.home') || 'Home', path: '/' },
-    { label: t('app.nav.products') || 'Produits', path: '/products' },
     { label: t('app.nav.showcase') || 'Mise en avant', path: '/showcase' },
+    { label: t('app.nav.products') || 'Produits', path: '/products' },
     { label: t('app.nav.services') || 'Services', path: '/services' },
-    { label: t('app.nav.categories') || 'Catégories', path: '/categories' },
     { label: 'Tags', path: '/tags' },
+    { label: t('app.nav.categories') || 'Catégories', path: '/categories' },
     { label: t('app.nav.users') || 'Users', path: '/users' },
   ];
 

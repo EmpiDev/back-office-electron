@@ -4,7 +4,9 @@
         "nav": {
             "home": "Home",
             "products": "Products",
+            "showcase": "Showcase",
             "services": "Services",
+            "categories": "Categories",
             "users": "Users"
         }
     },
@@ -72,5 +74,16 @@
         "editTag": "Edit Tag",
         "searchPlaceholder": "Search for a tag...",
         "nameLabel": "Tag Name"
+    },
+    "categories": {
+        "title": "Categories Management",
+        "addCategory": "Add Category",
+        "searchPlaceholder": "Search category..."
+    },
+    "showcase": {
+        "title": "Showcase",
+        "carousel": "Carousel",
+        "topProducts": "Top Products",
+        "availableProducts": "Available Products"
     }
 }
