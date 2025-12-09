@@ -5,15 +5,16 @@ const { dbRun, dbGet, dbAll } = require('../db-helper');
 // Create
 const createProduct = async (product) => {
     const sql = `
-        INSERT INTO products (code, name, description, target_segment, is_highlighted)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO products (code, name, description, target_segment, is_in_carousel, is_top_product)
+        VALUES (?, ?, ?, ?, ?, ?)
     `;
     const result = await dbRun(sql, [
         product.code, 
         product.name, 
         product.description, 
         product.target_segment, 
-        product.is_highlighted ? 1 : 0
+        product.is_in_carousel ? 1 : 0,
+        product.is_top_product ? 1 : 0
     ]);
     return { id: result.id, ...product };
 };
@@ -40,7 +41,7 @@ const getProductByCode = async (code) => {
 const updateProduct = async (id, product) => {
     const sql = `
         UPDATE products
-        SET code = ?, name = ?, description = ?, target_segment = ?, is_highlighted = ?, updated_at = CURRENT_TIMESTAMP
+        SET code = ?, name = ?, description = ?, target_segment = ?, is_in_carousel = ?, is_top_product = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
     `;
     await dbRun(sql, [
@@ -48,7 +49,8 @@ const updateProduct = async (id, product) => {
         product.name, 
         product.description, 
         product.target_segment, 
-        product.is_highlighted ? 1 : 0, 
+        product.is_in_carousel ? 1 : 0,
+        product.is_top_product ? 1 : 0,
         id
     ]);
     return await getProductById(id);

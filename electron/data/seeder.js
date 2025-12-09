@@ -6,17 +6,39 @@ const initialData = {
     categories: [
         { name: 'Support', description: 'Technical support services' },
         { name: 'Consulting', description: 'Expert consulting' },
-        { name: 'Development', description: 'Software development' }
+        { name: 'Development', description: 'Software development' },
+        { name: 'Security', description: 'Cybersecurity services' }
     ],
     services: [
-        { code: 'SRV-SUP-L1', name: 'Level 1 Support', description: 'Basic email support', category_name: 'Support' },
-        { code: 'SRV-SUP-L2', name: 'Level 2 Support', description: 'Phone and email support', category_name: 'Support' },
-        { code: 'SRV-DEV-WEB', name: 'Web Development', description: 'React/Node development', category_name: 'Development' }
+        { code: 'SRV-SUP-L1', name: 'Level 1 Support', description: 'Basic email support', unit: 'Ticket', category_name: 'Support' },
+        { code: 'SRV-AUDIT-SEC', name: 'Security Audit', description: 'Full infrastructure audit', unit: 'Day', category_name: 'Security' },
+        { code: 'SRV-DEV-WEB', name: 'Web Development', description: 'React/Node development', unit: 'Day', category_name: 'Development' },
+        { code: 'SRV-SOC-MON', name: 'SOC Monitoring', description: '24/7 Security Monitoring', unit: 'Month', category_name: 'Security' }
     ],
     products: [
-        { code: 'PRD-STARTER', name: 'Starter Pack', description: 'Essential tools for small teams', target_segment: 'SME', is_highlighted: 1 },
-        { code: 'PRD-PRO', name: 'Pro Pack', description: 'Advanced features for scaling businesses', target_segment: 'Mid-Market', is_highlighted: 1 },
-        { code: 'PRD-ENT', name: 'Enterprise Suite', description: 'Full access with dedicated support', target_segment: 'Enterprise', is_highlighted: 0 }
+        { 
+            code: 'PRD-AUDIT-PACK', 
+            name: 'Audit Pack', 
+            description: 'Complete security assessment', 
+            target_segment: 'SME', 
+            is_in_carousel: 1, 
+            is_top_product: 0,
+            services: [
+                { code: 'SRV-AUDIT-SEC', quantity: 5 } // Volume: 5 Days of audit
+            ]
+        },
+        { 
+            code: 'PRD-SOC-YEAR', 
+            name: 'Managed SOC', 
+            description: 'Yearly SOC subscription', 
+            target_segment: 'Enterprise', 
+            is_in_carousel: 1, 
+            is_top_product: 1,
+            services: [
+                { code: 'SRV-SOC-MON', quantity: 12 }, // Volume: 12 Months
+                { code: 'SRV-SUP-L1', quantity: 100 }  // Volume: 100 Tickets included
+            ]
+        }
     ]
 };
 
@@ -66,19 +88,37 @@ function seedDatabase(db) {
                     const cat = await get("SELECT id FROM categories WHERE name = ?", [srv.category_name]);
                     const catId = cat ? cat.id : null;
                     
-                    await run("INSERT INTO services (code, name, description, category_id) VALUES (?, ?, ?, ?)", 
-                        [srv.code, srv.name, srv.description, catId]);
+                    await run("INSERT INTO services (code, name, description, unit, category_id) VALUES (?, ?, ?, ?, ?)", 
+                        [srv.code, srv.name, srv.description, srv.unit, catId]);
                     console.log(`Service seeded: ${srv.code}`);
                 }
             }
 
              // Products
              for (const prod of initialData.products) {
-                const exists = await get("SELECT id FROM products WHERE code = ?", [prod.code]);
-                if (!exists) {
-                    await run("INSERT INTO products (code, name, description, target_segment, is_highlighted) VALUES (?, ?, ?, ?, ?)", 
-                        [prod.code, prod.name, prod.description, prod.target_segment, prod.is_highlighted]);
+                let prodId;
+                const existingProd = await get("SELECT id FROM products WHERE code = ?", [prod.code]);
+                
+                if (!existingProd) {
+                    const result = await run("INSERT INTO products (code, name, description, target_segment, is_in_carousel, is_top_product) VALUES (?, ?, ?, ?, ?, ?)", 
+                        [prod.code, prod.name, prod.description, prod.target_segment, prod.is_in_carousel, prod.is_top_product]);
+                    prodId = result.lastID;
                     console.log(`Product seeded: ${prod.code}`);
+
+                    // Seed Product-Services (Volume)
+                    if (prod.services) {
+                        for (const prodSrv of prod.services) {
+                            const service = await get("SELECT id FROM services WHERE code = ?", [prodSrv.code]);
+                            if (service) {
+                                await run("INSERT INTO product_services (product_id, service_id, quantity) VALUES (?, ?, ?)", 
+                                    [prodId, service.id, prodSrv.quantity]);
+                                console.log(`   -> Linked service ${prodSrv.code} (Qty: ${prodSrv.quantity})`);
+                            }
+                        }
+                    }
+
+                } else {
+                    prodId = existingProd.id;
                 }
             }
             

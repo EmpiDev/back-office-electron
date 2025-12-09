@@ -19,11 +19,15 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 
 -- Services Table
+-- Définition Métier : "Ce que Cyna fait concrètement : audit, SOC, CERT, formation, etc."
+-- C’est la “brique fonctionnelle” de base, sans notion commerciale directe (pas de prix ici).
 CREATE TABLE IF NOT EXISTS services (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     description TEXT,
+    -- Unité de l'intervention (ex: 'Jours', 'Heures', 'Forfait', 'Ticket', 'Utilisateur')
+    unit TEXT, 
     category_id INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -31,37 +35,44 @@ CREATE TABLE IF NOT EXISTS services (
 );
 
 -- Products Table
+-- Définition Commerciale : "Ensemble packagé de services + un cadrage commercial (prix, durée, volume, options)"
+-- C'est ce que l'on vend au client.
 CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     description TEXT,
     target_segment TEXT,
-    is_highlighted BOOLEAN DEFAULT 0,
+    -- Mise en avant
+    is_in_carousel BOOLEAN DEFAULT 0,
+    is_top_product BOOLEAN DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Pricing Plans Table (One Product has Many Plans)
+-- Pricing Plans Table
+-- Le cadrage commercial principal (Prix, Durée)
 CREATE TABLE IF NOT EXISTS pricing_plans (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     product_id INTEGER NOT NULL,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL, -- ex: "Standard", "Premium"
     price REAL NOT NULL,
     currency TEXT DEFAULT 'EUR',
-    billing_interval TEXT, -- e.g., 'monthly', 'yearly'
+    billing_interval TEXT, -- ex: 'monthly', 'yearly', 'one-shot'
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
 -- Options Table
+-- Options additionnelles vendables avec un produit
 CREATE TABLE IF NOT EXISTS options (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     description TEXT,
     price REAL,
+    unit TEXT, -- ex: 'Jours supplémentaires', 'TB Stockage'
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -74,16 +85,20 @@ CREATE TABLE IF NOT EXISTS tags (
 );
 
 -- Join Table: Product <-> Service
+-- "Ensemble packagé de services" + "Volume"
+-- Définit QUELS services sont dans le produit et en QUELLE quantité (Volume).
 CREATE TABLE IF NOT EXISTS product_services (
     product_id INTEGER NOT NULL,
     service_id INTEGER NOT NULL,
+    quantity INTEGER DEFAULT 1, -- Le "Volume" inclus (ex: 5 Jours d'audit, 1 SOC Monitoring)
+    display_order INTEGER DEFAULT 0,
     PRIMARY KEY (product_id, service_id),
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
 );
 
 -- Join Table: Product <-> Option
-CREATE TABLE IF NOT EXISTS product_options (
+CREATE TABLE IF NOT EXISTS option_products (
     product_id INTEGER NOT NULL,
     option_id INTEGER NOT NULL,
     PRIMARY KEY (product_id, option_id),
