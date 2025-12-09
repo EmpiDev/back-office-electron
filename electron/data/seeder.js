@@ -7,7 +7,9 @@ const initialData = {
         { name: 'Support', description: 'Technical support services' },
         { name: 'Consulting', description: 'Expert consulting' },
         { name: 'Development', description: 'Software development' },
-        { name: 'Security', description: 'Cybersecurity services' }
+        { name: 'Security', description: 'Cybersecurity services' },
+        { name: 'Infrastructure', description: 'Cloud and On-Premise infrastructure' },
+        { name: 'Training', description: 'Professional training and workshops' }
     ],
     services: [
         { tag: 'SRV-SUP-L1', name: 'Level 1 Support', description: 'Basic email support', unit: 'Ticket', category_name: 'Support' },
@@ -44,6 +46,20 @@ const initialData = {
                 { tag: 'SRV-SUP-L1', quantity: 100 }  // Volume: 100 Tickets included
             ],
             tags: ['Security', '24/7', 'Enterprise', 'Cloud', 'Monitoring']
+        },
+        {
+            tag: 'PRD-DEV-START',
+            name: 'Startup Dev Pack',
+            description: 'Full stack development team for 1 month',
+            target_segment: 'Startup',
+            is_in_carousel: 1,
+            is_top_product: 0,
+            price: 15000,
+            payment_type: 'one_time',
+            services: [
+                { tag: 'SRV-DEV-WEB', quantity: 20 }
+            ],
+            tags: ['Startup', 'Development', 'Web']
         }
     ],
     tags: [

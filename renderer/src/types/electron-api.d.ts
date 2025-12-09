@@ -51,6 +51,14 @@ export interface Tag {
   created_at?: string;
 }
 
+export interface Category {
+  id?: number;
+  name: string;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 declare global {
   interface ElectronApi {
     ping: () => Promise<unknown>
@@ -101,6 +109,12 @@ declare global {
     getTagsForProduct: (productId: number) => Promise<Tag[]>;
     addTagToProduct: (productId: number, tagId: number) => Promise<any>;
     removeTagFromProduct: (productId: number, tagId: number) => Promise<void>;
+
+    // Categories
+    getCategories: () => Promise<Category[]>;
+    createCategory: (category: Category) => Promise<Category>;
+    updateCategory: (id: number, category: Category) => Promise<Category>;
+    deleteCategory: (id: number) => Promise<void>;
   }
 
   interface Window {

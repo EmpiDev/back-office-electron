@@ -8,6 +8,7 @@ const userService = require('./data/services/user.service');
 const serviceService = require('./data/services/service.service');
 const productService = require('./data/services/product.service');
 const tagService = require('./data/services/tag.service');
+const categoryService = require('./data/services/category.service');
 
 const APP_NAME = "Mon app";
 
@@ -146,6 +147,20 @@ ipcMain.handle('tags:add-to-product', async (_event, productId, tagId) => {
 });
 ipcMain.handle('tags:remove-from-product', async (_event, productId, tagId) => {
     return await tagService.removeTagFromProduct(productId, tagId);
+});
+
+// Categories
+ipcMain.handle('categories:get-all', async () => {
+    return await categoryService.getAllCategories();
+});
+ipcMain.handle('categories:create', async (_event, category) => {
+    return await categoryService.createCategory(category);
+});
+ipcMain.handle('categories:update', async (_event, id, category) => {
+    return await categoryService.updateCategory(id, category);
+});
+ipcMain.handle('categories:delete', async (_event, id) => {
+    return await categoryService.deleteCategory(id);
 });
 
 

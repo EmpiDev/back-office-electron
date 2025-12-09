@@ -49,4 +49,10 @@ contextBridge.exposeInMainWorld("electronApi", {
     getTagsForProduct: (productId) => ipcRenderer.invoke('tags:get-for-product', productId),
     addTagToProduct: (productId, tagId) => ipcRenderer.invoke('tags:add-to-product', productId, tagId),
     removeTagFromProduct: (productId, tagId) => ipcRenderer.invoke('tags:remove-from-product', productId, tagId),
+
+    // Categories
+    getCategories: () => ipcRenderer.invoke('categories:get-all'),
+    createCategory: (category) => ipcRenderer.invoke('categories:create', category),
+    updateCategory: (id, category) => ipcRenderer.invoke('categories:update', id, category),
+    deleteCategory: (id) => ipcRenderer.invoke('categories:delete', id),
 });
