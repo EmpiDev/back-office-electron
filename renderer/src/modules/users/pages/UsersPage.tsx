@@ -9,6 +9,7 @@ export default function UsersPage() {
     const [users, setUsers] = useState<any[]>([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [newUser, setNewUser] = useState({ username: '', password_hash: '123456', role: 'user' });
+    const [editingUserId, setEditingUserId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
@@ -20,9 +21,33 @@ export default function UsersPage() {
         setUsers(u);
     };
 
-    const handleCreateUser = async () => {
-        await window.electronApi.createUser(newUser);
+    const handleOpenCreateDialog = () => {
+        setEditingUserId(null);
         setNewUser({ username: '', password_hash: '123456', role: 'user' });
+        setOpenDialog(true);
+    };
+
+    const handleEditUser = (user: any) => {
+        setEditingUserId(user.id);
+        setNewUser({
+            username: user.username,
+            password_hash: '', // Do not populate password hash for security
+            role: user.role
+        });
+        setOpenDialog(true);
+    };
+
+    const handleSaveUser = async () => {
+        if (editingUserId) {
+             // If password is empty, maybe don't update it?
+             // The backend logic for updateUser currently ignores password updates (see previous context)
+             // But let's send what we have.
+            await window.electronApi.updateUser(editingUserId, newUser);
+        } else {
+            await window.electronApi.createUser(newUser);
+        }
+        setNewUser({ username: '', password_hash: '123456', role: 'user' });
+        setEditingUserId(null);
         setOpenDialog(false);
         loadData();
     };
@@ -49,7 +74,7 @@ export default function UsersPage() {
                 <Button 
                     variant="contained" 
                     startIcon={<AddIcon />} 
-                    onClick={() => setOpenDialog(true)}
+                    onClick={handleOpenCreateDialog}
                 >
                     {t('users.addUser')}
                 </Button>
@@ -78,11 +103,12 @@ export default function UsersPage() {
                     columns={columns}
                     data={filteredUsers}
                     onDelete={handleDeleteUser}
+                    onEdit={handleEditUser}
                 />
             </Paper>
 
              <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>{t('users.addUser')}</DialogTitle>
+                <DialogTitle>{editingUserId ? t('common.edit') : t('users.addUser')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1 }}>
                         <Grid container spacing={2}>
@@ -114,7 +140,7 @@ export default function UsersPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setOpenDialog(false)}>Annuler</Button>
-                    <Button variant="contained" onClick={handleCreateUser}>{t('users.add')}</Button>
+                    <Button variant="contained" onClick={handleSaveUser}>{editingUserId ? t('common.save') : t('users.add')}</Button>
                 </DialogActions>
             </Dialog>
         </Box>

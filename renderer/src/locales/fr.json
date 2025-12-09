@@ -20,7 +20,9 @@
     "delete": "Supprimer",
     "actions": "Actions",
     "noData": "Aucune donnée disponible",
-    "quantity": "Quantité"
+    "quantity": "Quantité",
+    "edit": "Modifier",
+    "save": "Enregistrer"
   },
   "products": {
     "title": "Gestion des Produits",

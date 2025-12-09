@@ -11,6 +11,7 @@ export default function ProductsPage() {
     const [openDialog, setOpenDialog] = useState(false);
     const [newProduct, setNewProduct] = useState<any>({ code: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Updated fields
     const [selectedServicesInForm, setSelectedServicesInForm] = useState<Array<{ serviceId: number; quantity: number }>>([]); // New state for selected services
+    const [editingProductId, setEditingProductId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
@@ -24,14 +25,73 @@ export default function ProductsPage() {
         setAllServices(s);
     };
 
-    const handleCreateProduct = async () => {
-        const createdProduct = await window.electronApi.createProduct(newProduct);
-        // Link selected services to the new product
-        for (const selectedService of selectedServicesInForm) {
-            await window.electronApi.addServiceToProduct(createdProduct.id, selectedService.serviceId, selectedService.quantity);
+    const handleOpenCreateDialog = () => {
+        setEditingProductId(null);
+        setNewProduct({ code: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' });
+        setSelectedServicesInForm([]);
+        setOpenDialog(true);
+    };
+
+    const handleEditProduct = async (product: any) => {
+        setEditingProductId(product.id);
+        setNewProduct({ 
+            code: product.code, 
+            name: product.name, 
+            description: product.description, 
+            target_segment: product.target_segment, 
+            is_in_carousel: !!product.is_in_carousel, 
+            is_top_product: !!product.is_top_product,
+            price: product.price || 0,
+            payment_type: product.payment_type || 'one_time'
+        });
+        
+        // Load associated services
+        const services = await window.electronApi.getServicesForProduct(product.id);
+        setSelectedServicesInForm(services.map(s => ({ serviceId: s.service_id, quantity: s.quantity })));
+        
+        setOpenDialog(true);
+    };
+
+    const handleSaveProduct = async () => {
+        let savedProduct;
+        if (editingProductId) {
+             savedProduct = await window.electronApi.updateProduct(editingProductId, newProduct);
+             // For update, we might want to clear existing services and re-add them, or handle diff. 
+             // For simplicity, let's assume we clear and re-add or just add (if API supports it).
+             // Ideally backend should handle "sync". Here we will just add/replace.
+             // To do it cleanly without "sync" logic on backend, we might need to remove all first? 
+             // Or we rely on `addServiceToProduct` being an INSERT OR REPLACE or similar?
+             // Checking `product.service.js`: `addServiceToProduct` uses `INSERT OR REPLACE`. 
+             // However, to remove services that were de-selected, we need explicit removal.
+             
+             // Simplest approach for now: Get existing, compare, add/remove. 
+             // OR: Remove all services for product and re-add.
+             // Let's go with: Remove all manually (if we had a removeAll) or just iterate.
+             
+             // Actually, let's just re-add/update for now. 
+             // NOTE: This logic won't remove services if they are unchecked. 
+             // TODO: Implement proper sync. For now, let's assume user adds/modifies. 
+             // To support removal, we need `removeServiceFromProduct`.
+             const currentServices = await window.electronApi.getServicesForProduct(editingProductId);
+             for(const s of currentServices) {
+                 if(!selectedServicesInForm.find(newS => newS.serviceId === s.service_id)) {
+                     await window.electronApi.removeServiceFromProduct(editingProductId, s.service_id);
+                 }
+             }
+        } else {
+             savedProduct = await window.electronApi.createProduct(newProduct);
         }
+
+        const productId = savedProduct ? savedProduct.id : editingProductId;
+
+        // Link selected services to the product
+        for (const selectedService of selectedServicesInForm) {
+            await window.electronApi.addServiceToProduct(productId!, selectedService.serviceId, selectedService.quantity);
+        }
+        
         setNewProduct({ code: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Reset form
         setSelectedServicesInForm([]); // Reset selected services
+        setEditingProductId(null);
         setOpenDialog(false);
         loadData();
     };
@@ -76,7 +136,7 @@ export default function ProductsPage() {
                     <Button 
                         variant="contained" 
                         startIcon={<AddIcon />} 
-                        onClick={() => setOpenDialog(true)}
+                        onClick={handleOpenCreateDialog}
                     >
                         {t('products.addProduct')}
                     </Button>
@@ -106,11 +166,12 @@ export default function ProductsPage() {
                     columns={columns}
                     data={filteredProducts}
                     onDelete={handleDeleteProduct}
+                    onEdit={handleEditProduct}
                 />
             </Paper>
 
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>{t('products.addProduct')}</DialogTitle>
+                <DialogTitle>{editingProductId ? t('common.edit') : t('products.addProduct')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1 }}>
                         <Grid container spacing={2}>
@@ -196,7 +257,7 @@ export default function ProductsPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setOpenDialog(false)}>Annuler</Button>
-                    <Button variant="contained" onClick={handleCreateProduct}>{t('products.add')}</Button>
+                    <Button variant="contained" onClick={handleSaveProduct}>{editingProductId ? t('common.save') : t('products.add')}</Button>
                 </DialogActions>
             </Dialog>
         </Box>

@@ -54,16 +54,19 @@ declare global {
     // Users
     getUsers: () => Promise<User[]>;
     createUser: (user: User) => Promise<User>;
+    updateUser: (id: number, user: User) => Promise<User>;
     deleteUser(id: number): unknown;
 
     // Services
     getServices: () => Promise<Service[]>;
     createService: (service: Service) => Promise<Service>;
+    updateService: (id: number, service: Service) => Promise<Service>;
     deleteService: (id: number) => Promise<void>;
 
     // Products
     getProducts: () => Promise<Product[]>;
     createProduct: (product: Product) => Promise<Product>;
+    updateProduct: (id: number, product: Product) => Promise<Product>;
     deleteProduct: (id: number) => Promise<void>;
     
     // Product Services Management

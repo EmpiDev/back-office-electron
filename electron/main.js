@@ -54,6 +54,9 @@ ipcMain.handle('users:create', async (_event, user) => {
 ipcMain.handle('users:delete', async (_event, user) => {
     return await userService.deleteUser(user);
 });
+ipcMain.handle('users:update', async (_event, id, user) => {
+    return await userService.updateUser(id, user);
+});
 
 // Services
 ipcMain.handle('services:get-all', async () => {
@@ -61,6 +64,9 @@ ipcMain.handle('services:get-all', async () => {
 });
 ipcMain.handle('services:create', async (_event, service) => {
     return await serviceService.createService(service);
+});
+ipcMain.handle('services:update', async (_event, id, service) => {
+    return await serviceService.updateService(id, service);
 });
 ipcMain.handle('services:delete', async (_event, id) => {
     return await serviceService.deleteService(id);
@@ -72,6 +78,9 @@ ipcMain.handle('products:get-all', async () => {
 });
 ipcMain.handle('products:create', async (_event, product) => {
     return await productService.createProduct(product);
+});
+ipcMain.handle('products:update', async (_event, id, product) => {
+    return await productService.updateProduct(id, product);
 });
 ipcMain.handle('products:delete', async (_event, id) => {
     return await productService.deleteProduct(id);

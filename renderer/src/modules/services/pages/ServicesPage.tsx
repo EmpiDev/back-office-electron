@@ -9,6 +9,7 @@ export default function ServicesPage() {
     const [services, setServices] = useState<any[]>([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [newService, setNewService] = useState({ code: '', name: '', description: '', category_id: null });
+    const [editingServiceId, setEditingServiceId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
@@ -20,9 +21,31 @@ export default function ServicesPage() {
         setServices(s);
     };
 
-    const handleCreateService = async () => {
-        await window.electronApi.createService(newService);
+    const handleOpenCreateDialog = () => {
+        setEditingServiceId(null);
         setNewService({ code: '', name: '', description: '', category_id: null });
+        setOpenDialog(true);
+    };
+
+    const handleEditService = (service: any) => {
+        setEditingServiceId(service.id);
+        setNewService({
+            code: service.code,
+            name: service.name,
+            description: service.description || '',
+            category_id: service.category_id
+        });
+        setOpenDialog(true);
+    };
+
+    const handleSaveService = async () => {
+        if (editingServiceId) {
+            await window.electronApi.updateService(editingServiceId, newService);
+        } else {
+            await window.electronApi.createService(newService);
+        }
+        setNewService({ code: '', name: '', description: '', category_id: null });
+        setEditingServiceId(null);
         setOpenDialog(false);
         loadData();
     };
@@ -49,7 +72,7 @@ export default function ServicesPage() {
                 <Button 
                     variant="contained" 
                     startIcon={<AddIcon />} 
-                    onClick={() => setOpenDialog(true)}
+                    onClick={handleOpenCreateDialog}
                 >
                     {t('services.addService')}
                 </Button>
@@ -78,11 +101,12 @@ export default function ServicesPage() {
                     columns={columns}
                     data={filteredServices}
                     onDelete={handleDeleteService}
+                    onEdit={handleEditService}
                 />
             </Paper>
 
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>{t('services.addService')}</DialogTitle>
+                <DialogTitle>{editingServiceId ? t('common.edit') : t('services.addService')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1 }}>
                         <Grid container spacing={2}>
@@ -107,7 +131,7 @@ export default function ServicesPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setOpenDialog(false)}>Annuler</Button>
-                    <Button variant="contained" onClick={handleCreateService}>{t('services.add')}</Button>
+                    <Button variant="contained" onClick={handleSaveService}>{editingServiceId ? t('common.save') : t('services.add')}</Button>
                 </DialogActions>
             </Dialog>
         </Box>

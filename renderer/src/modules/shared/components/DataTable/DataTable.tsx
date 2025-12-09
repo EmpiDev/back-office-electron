@@ -22,9 +22,10 @@ interface DataTableProps<T> {
     columns: Column<T>[];
     data: T[];
     onDelete?: (id: number) => void;
+    onEdit?: (item: T) => void;
 }
 
-export default function DataTable<T extends { id: number }>({ columns, data, onDelete }: DataTableProps<T>) {
+export default function DataTable<T extends { id: number }>({ columns, data, onDelete, onEdit }: DataTableProps<T>) {
     const { t } = useTranslation();
 
     return (
@@ -37,7 +38,7 @@ export default function DataTable<T extends { id: number }>({ columns, data, onD
                                 {col.label}
                             </TableCell>
                         ))}
-                        {onDelete && <TableCell align="right">{t('common.actions')}</TableCell>}
+                        {(onDelete || onEdit) && <TableCell align="right">{t('common.actions')}</TableCell>}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -48,22 +49,34 @@ export default function DataTable<T extends { id: number }>({ columns, data, onD
                                     {col.render ? col.render(row) : (row as any)[col.id]}
                                 </TableCell>
                             ))}
-                            {onDelete && (
+                            {(onDelete || onEdit) && (
                                 <TableCell align="right">
-                                    <Button 
-                                        size="small" 
-                                        color="error" 
-                                        onClick={() => onDelete(row.id)}
-                                    >
-                                        {t('common.delete')}
-                                    </Button>
+                                    {onEdit && (
+                                        <Button
+                                            size="small"
+                                            color="primary"
+                                            onClick={() => onEdit(row)}
+                                            sx={{ mr: 1 }}
+                                        >
+                                            {t('common.edit') || 'Modifier'}
+                                        </Button>
+                                    )}
+                                    {onDelete && (
+                                        <Button 
+                                            size="small" 
+                                            color="error" 
+                                            onClick={() => onDelete(row.id)}
+                                        >
+                                            {t('common.delete')}
+                                        </Button>
+                                    )}
                                 </TableCell>
                             )}
                         </TableRow>
                     ))}
                     {data.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={columns.length + (onDelete ? 1 : 0)} align="center">
+                            <TableCell colSpan={columns.length + ((onDelete || onEdit) ? 1 : 0)} align="center">
                                 <span style={{ color: '#999', fontStyle: 'italic' }}>{t('common.noData')}</span>
                             </TableCell>
                         </TableRow>
