@@ -29,8 +29,10 @@
         "cancel": "Cancel",
         "price": "Price",
         "paymentType": "Payment Type",
-        "description": "Description",
-        "unit": "unit"
+        "unit": "unit",
+        "search": "Search",
+        "sortByName": "Name",
+        "sortByPrice": "Price"
     },
     "products": {
         "title": "Products Management",
@@ -85,6 +87,7 @@
     },
     "showcase": {
         "title": "Showcase",
+        "carouselLimitReached": "Carousel limit of {{limit}} products reached.",
         "carousel": "Carousel",
         "topProducts": "Top Products",
         "availableProducts": "Available Products"

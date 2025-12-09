@@ -29,8 +29,10 @@
         "cancel": "Annuler",
         "price": "Prix",
         "paymentType": "Type de paiement",
-        "description": "Description",
-        "unit": "unité"
+        "unit": "unité",
+        "search": "Rechercher",
+        "sortByName": "Nom",
+        "sortByPrice": "Prix"
     },
     "products": {
         "title": "Gestion des Produits",
@@ -85,6 +87,7 @@
     },
     "showcase": {
         "title": "Mise en avant",
+        "carouselLimitReached": "Limite de {{limit}} produits atteinte pour le carrousel.",
         "carousel": "Carrousel",
         "topProducts": "Top Produits",
         "availableProducts": "Produits Disponibles"
