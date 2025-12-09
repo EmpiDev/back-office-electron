@@ -5,8 +5,8 @@ const { dbRun, dbGet, dbAll } = require('../db-helper');
 // Create Product
 const createProduct = async (product) => {
     const sql = `
-        INSERT INTO products (code, name, description, target_segment, is_in_carousel, is_top_product)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO products (code, name, description, target_segment, is_in_carousel, is_top_product, price, payment_type)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const result = await dbRun(sql, [
         product.code, 
@@ -14,7 +14,9 @@ const createProduct = async (product) => {
         product.description, 
         product.target_segment, 
         product.is_in_carousel ? 1 : 0,
-        product.is_top_product ? 1 : 0
+        product.is_top_product ? 1 : 0,
+        product.price,
+        product.payment_type
     ]);
     return { id: result.id, ...product };
 };
@@ -41,7 +43,7 @@ const getProductByCode = async (code) => {
 const updateProduct = async (id, product) => {
     const sql = `
         UPDATE products
-        SET code = ?, name = ?, description = ?, target_segment = ?, is_in_carousel = ?, is_top_product = ?, updated_at = CURRENT_TIMESTAMP
+        SET code = ?, name = ?, description = ?, target_segment = ?, is_in_carousel = ?, is_top_product = ?, price = ?, payment_type = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
     `;
     await dbRun(sql, [
@@ -51,6 +53,8 @@ const updateProduct = async (id, product) => {
         product.target_segment, 
         product.is_in_carousel ? 1 : 0,
         product.is_top_product ? 1 : 0,
+        product.price,
+        product.payment_type,
         id
     ]);
     return await getProductById(id);

@@ -23,6 +23,8 @@ const initialData = {
             target_segment: 'SME', 
             is_in_carousel: 1, 
             is_top_product: 0,
+            price: 5000,
+            payment_type: 'one_time',
             services: [
                 { code: 'SRV-AUDIT-SEC', quantity: 5 } // Volume: 5 Days of audit
             ]
@@ -34,6 +36,8 @@ const initialData = {
             target_segment: 'Enterprise', 
             is_in_carousel: 1, 
             is_top_product: 1,
+            price: 2000,
+            payment_type: 'monthly',
             services: [
                 { code: 'SRV-SOC-MON', quantity: 12 }, // Volume: 12 Months
                 { code: 'SRV-SUP-L1', quantity: 100 }  // Volume: 100 Tickets included
@@ -100,8 +104,8 @@ function seedDatabase(db) {
                 const existingProd = await get("SELECT id FROM products WHERE code = ?", [prod.code]);
                 
                 if (!existingProd) {
-                    const result = await run("INSERT INTO products (code, name, description, target_segment, is_in_carousel, is_top_product) VALUES (?, ?, ?, ?, ?, ?)", 
-                        [prod.code, prod.name, prod.description, prod.target_segment, prod.is_in_carousel, prod.is_top_product]);
+                    const result = await run("INSERT INTO products (code, name, description, target_segment, is_in_carousel, is_top_product, price, payment_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
+                        [prod.code, prod.name, prod.description, prod.target_segment, prod.is_in_carousel, prod.is_top_product, prod.price, prod.payment_type]);
                     prodId = result.lastID;
                     console.log(`Product seeded: ${prod.code}`);
 

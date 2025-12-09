@@ -28,6 +28,8 @@ export interface Product {
   target_segment?: string | null;
   is_in_carousel?: boolean;
   is_top_product?: boolean;
+  price?: number;
+  payment_type?: 'one_time' | 'monthly';
   created_at?: string;
   updated_at?: string;
 }

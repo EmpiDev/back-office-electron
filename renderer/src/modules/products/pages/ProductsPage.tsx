@@ -9,7 +9,7 @@ export default function ProductsPage() {
     const [products, setProducts] = useState<any[]>([]);
     const [allServices, setAllServices] = useState<any[]>([]); // New state for all available services
     const [openDialog, setOpenDialog] = useState(false);
-    const [newProduct, setNewProduct] = useState({ code: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false }); // Updated fields
+    const [newProduct, setNewProduct] = useState<any>({ code: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Updated fields
     const [selectedServicesInForm, setSelectedServicesInForm] = useState<Array<{ serviceId: number; quantity: number }>>([]); // New state for selected services
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -30,7 +30,7 @@ export default function ProductsPage() {
         for (const selectedService of selectedServicesInForm) {
             await window.electronApi.addServiceToProduct(createdProduct.id, selectedService.serviceId, selectedService.quantity);
         }
-        setNewProduct({ code: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false }); // Reset form
+        setNewProduct({ code: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Reset form
         setSelectedServicesInForm([]); // Reset selected services
         setOpenDialog(false);
         loadData();
@@ -44,6 +44,8 @@ export default function ProductsPage() {
     const columns: Column<any>[] = [
         { id: 'code', label: t('common.code') },
         { id: 'name', label: t('common.name') },
+        { id: 'price', label: 'Prix', format: (value, row) => `${value} €` },
+        { id: 'payment_type', label: 'Type de paiement', format: (value) => value === 'monthly' ? 'Par mois' : 'En une fois' },
         // { id: 'description', label: t('common.description') }, // Optional
     ];
 
@@ -127,6 +129,28 @@ export default function ProductsPage() {
                                     onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} 
                                     fullWidth 
                                 />
+                            </Grid>
+                            <Grid size={{ xs: 6 }}>
+                                <TextField 
+                                    label="Prix (€)" 
+                                    type="number"
+                                    value={newProduct.price} 
+                                    onChange={e => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })} 
+                                    fullWidth 
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 6 }}>
+                                <FormControl fullWidth>
+                                    <InputLabel>Type de paiement</InputLabel>
+                                    <Select
+                                        value={newProduct.payment_type}
+                                        label="Type de paiement"
+                                        onChange={e => setNewProduct({ ...newProduct, payment_type: e.target.value })}
+                                    >
+                                        <MenuItem value="one_time">En une fois</MenuItem>
+                                        <MenuItem value="monthly">Par mois</MenuItem>
+                                    </Select>
+                                </FormControl>
                             </Grid>
                             <Grid size={{ xs: 12 }}>
                                 <TextField 

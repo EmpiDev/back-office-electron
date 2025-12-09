@@ -46,6 +46,8 @@ CREATE TABLE IF NOT EXISTS products (
     -- Mise en avant
     is_in_carousel BOOLEAN DEFAULT 0,
     is_top_product BOOLEAN DEFAULT 0,
+    price REAL,
+    payment_type TEXT, -- 'one_time', 'monthly'
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
