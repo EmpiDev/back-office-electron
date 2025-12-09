@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, Autocomplete, Chip } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { Tag } from '../../../types/electron-api';
+import SearchFilterBar from '../../shared/components/SearchFilterBar';
 import DataTable, { Column } from '@/modules/shared/components/DataTable/DataTable';
 
 export default function ServicesPage() {
@@ -13,6 +15,7 @@ export default function ServicesPage() {
     const [selectedTagsInForm, setSelectedTagsInForm] = useState<number[]>([]);
     const [editingServiceId, setEditingServiceId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedFilterTags, setSelectedFilterTags] = useState<Tag[]>([]);
 
     useEffect(() => {
         loadData();
@@ -115,10 +118,13 @@ export default function ServicesPage() {
         { id: 'name', label: t('common.name') },
     ];
 
-    const filteredServices = services.filter(s => 
-        s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        s.tag.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredServices = services.filter(service => {
+        const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesTags = selectedFilterTags.length === 0 || 
+            selectedFilterTags.some(filterTag => service.tags && service.tags.some((t: any) => t.id === filterTag.id));
+        
+        return matchesSearch && matchesTags;
+    });
 
     return (
         <Box>
@@ -134,20 +140,12 @@ export default function ServicesPage() {
             </Box>
 
             <Paper sx={{ p: 2, borderRadius: 2, mb: 3 }}>
-                <TextField 
-                    fullWidth 
-                    variant="outlined" 
-                    placeholder={t('services.searchPlaceholder')} 
-                    size="small"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon color="action" />
-                            </InputAdornment>
-                        ),
-                    }}
+                <SearchFilterBar 
+                    searchText={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    selectedTags={selectedFilterTags}
+                    onTagsChange={setSelectedFilterTags}
+                    allTags={allTags} 
                 />
             </Paper>
 

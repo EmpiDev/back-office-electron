@@ -20,6 +20,7 @@
         "tag": "Tag",
         "tags": "Tags",
         "name": "Nom",
+        "description": "Description",
         "delete": "Supprimer",
         "actions": "Actions",
         "noData": "Aucune donnée disponible",
@@ -31,6 +32,7 @@
         "paymentType": "Type de paiement",
         "unit": "unité",
         "search": "Rechercher",
+        "filterByTags": "Filtrer par tags",
         "sortByName": "Nom",
         "sortByPrice": "Prix"
     },

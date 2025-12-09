@@ -4,13 +4,17 @@ import { useTranslation } from 'react-i18next';
 import StarIcon from '@mui/icons-material/Star';
 import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
 import SearchIcon from '@mui/icons-material/Search';
+import SearchFilterBar from '../../shared/components/SearchFilterBar';
+import { Tag } from '../../../types/electron-api';
 
 const CAROUSEL_LIMIT = 5;
 
 export default function ShowcasePage() {
     const { t } = useTranslation();
     const [products, setProducts] = useState<any[]>([]);
+    const [allTags, setAllTags] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedFilterTags, setSelectedFilterTags] = useState<Tag[]>([]);
     const [sortBy, setSortBy] = useState('name'); // 'name', 'price'
 
     useEffect(() => {
@@ -19,7 +23,23 @@ export default function ShowcasePage() {
 
     const loadData = async () => {
         const p = await window.electronApi.getProducts();
-        setProducts(p);
+        
+        // Fetch tags for filtering
+        const tags = await window.electronApi.getTags();
+        // Since we need to know product tags for filtering, and getProducts() might only return product data...
+        // Does getProducts return tags? The seeder/service implementation of getProducts usually returns tags if joined.
+        // Let's check Product Service. If not, we might need to fetch them.
+        // Assuming products have tags property or we need to fetch. 
+        // Based on ProductsPage, we fetched tags separately? NO, ProductsPage fetches tags for each product manually in `loadData`.
+        // I need to do the same here to ensure filtering works!
+        
+        const productsWithTags = await Promise.all(p.map(async (product: any) => {
+             const productTags = await window.electronApi.getTagsForProduct(product.id);
+             return { ...product, tags: productTags };
+        }));
+
+        setProducts(productsWithTags);
+        setAllTags(tags);
     };
 
     const toggleCarousel = async (product: any) => {
@@ -46,7 +66,12 @@ export default function ShowcasePage() {
     
     const otherProducts = products
         .filter(p => !p.is_in_carousel && !p.is_top_product)
-        .filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        .filter(p => {
+             const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+             const matchesTags = selectedFilterTags.length === 0 || 
+                 selectedFilterTags.some(filterTag => p.tags && p.tags.some((t: any) => t.id === filterTag.id));
+             return matchesSearch && matchesTags;
+        })
         .sort((a, b) => {
             if (sortBy === 'name') return a.name.localeCompare(b.name);
             if (sortBy === 'price') return (a.price || 0) - (b.price || 0);
@@ -116,22 +141,22 @@ export default function ShowcasePage() {
                 {/* All Other Products Section */}
                 <Grid size={{ xs: 12 }}>
                     <Paper sx={{ p: 2, borderRadius: 2, mt: 2 }}>
-                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
-                            <Typography variant="h6">{t('showcase.availableProducts') || 'Produits disponibles'}</Typography>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <TextField 
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, flexWrap: 'wrap', gap: 2 }}>
+                            <Box sx={{ flexGrow: 1 }}>
+                                 <Typography variant="h6" sx={{ mb: 2 }}>{t('showcase.availableProducts') || 'Produits disponibles'}</Typography>
+                                 <SearchFilterBar 
+                                    searchText={searchTerm}
+                                    onSearchChange={setSearchTerm}
+                                    selectedTags={selectedFilterTags}
+                                    onTagsChange={setSelectedFilterTags}
+                                    allTags={allTags}
                                     placeholder={t('common.search') || 'Rechercher'} 
-                                    size="small"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <SearchIcon />
-                                            </InputAdornment>
-                                        ),
-                                    }}
                                 />
+                            </Box>
+                            <Box sx={{ mt: 5 }}> 
+                                {/* Margin top to align with search bar effectively or just side by side? 
+                                    SearchFilterBar has mb: 3. Let's just put Sort in a nice place.
+                                */}
                                 <FormControl size="small" sx={{ minWidth: 120 }}>
                                     <Select
                                         value={sortBy}

@@ -7,15 +7,19 @@ import {
     TableRow, 
     Button, 
     Paper,
-    TableContainer
+    TableContainer,
+    TextField,
+    Box
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 
 export interface Column<T> {
     id: keyof T | string;
     label: string;
     render?: (row: T) => React.ReactNode;
     align?: 'left' | 'right' | 'center';
+    filterable?: boolean;
 }
 
 interface DataTableProps<T> {
@@ -27,6 +31,23 @@ interface DataTableProps<T> {
 
 export default function DataTable<T extends { id: number }>({ columns, data, onDelete, onEdit }: DataTableProps<T>) {
     const { t } = useTranslation();
+    const [filters, setFilters] = useState<Record<string, string>>({});
+
+    const handleFilterChange = (colId: string, value: string) => {
+        setFilters(prev => ({
+            ...prev,
+            [colId]: value
+        }));
+    };
+
+    const filteredData = data.filter(row => {
+        return columns.every(col => {
+            if (!col.filterable || !filters[String(col.id)]) return true;
+            const cellValue = (row as any)[col.id];
+            const filterValue = filters[String(col.id)].toLowerCase();
+            return String(cellValue).toLowerCase().includes(filterValue);
+        });
+    });
 
     return (
         <TableContainer component={Paper} variant="outlined" sx={{ mt: 2 }}>
@@ -36,13 +57,25 @@ export default function DataTable<T extends { id: number }>({ columns, data, onD
                         {columns.map((col) => (
                             <TableCell key={String(col.id)} align={col.align || 'left'}>
                                 {col.label}
+                                {col.filterable && (
+                                    <Box sx={{ mt: 1 }} onClick={(e) => e.stopPropagation()}>
+                                        <TextField 
+                                            size="small" 
+                                            variant="standard"
+                                            placeholder="..."
+                                            value={filters[String(col.id)] || ''}
+                                            onChange={(e) => handleFilterChange(String(col.id), e.target.value)}
+                                            fullWidth
+                                        />
+                                    </Box>
+                                )}
                             </TableCell>
                         ))}
                         {(onDelete || onEdit) && <TableCell align="right">{t('common.actions')}</TableCell>}
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {data.map((row) => (
+                    {filteredData.map((row) => (
                         <TableRow key={row.id}>
                             {columns.map((col) => (
                                 <TableCell key={String(col.id)} align={col.align || 'left'}>

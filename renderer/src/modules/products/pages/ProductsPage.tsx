@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, FormGroup, FormControlLabel, Chip, IconButton, Tooltip } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon, CloudDownload as DownloadIcon, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { Tag } from '../../../types/electron-api';
+import SearchFilterBar from '../../shared/components/SearchFilterBar';
 import DataTable, { Column } from '@/modules/shared/components/DataTable/DataTable';
 
 export default function ProductsPage() {
@@ -15,6 +17,7 @@ export default function ProductsPage() {
     const [selectedTagsInForm, setSelectedTagsInForm] = useState<number[]>([]); // State for selected tags (now auto-calculated)
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedFilterTags, setSelectedFilterTags] = useState<Tag[]>([]);
 
     // Automatic tag inheritance from selected services
     useEffect(() => {
@@ -183,7 +186,8 @@ export default function ProductsPage() {
             )
         },
         { id: 'name', label: t('common.name') },
-        { id: 'price', label: t('common.price'), format: (value, row) => `${value} €` },
+        { id: 'description', label: t('common.description') },
+        { id: 'price', label: t('common.price'), render: (row) => `${row.price} €` },
         { id: 'payment_type', label: t('common.paymentType'), format: (value) => value === 'monthly' ? t('products.paymentTypes.monthly') : t('products.paymentTypes.oneTime') },
         // { id: 'description', label: t('common.description') }, // Optional
     ];
@@ -202,10 +206,13 @@ export default function ProductsPage() {
         );
     };
 
-    const filteredProducts = products.filter(p => 
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        p.tag.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredProducts = products.filter(product => {
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesTags = selectedFilterTags.length === 0 || 
+            selectedFilterTags.some(filterTag => product.tags && product.tags.some((t: any) => t.id === filterTag.id));
+        
+        return matchesSearch && matchesTags;
+    });
 
     return (
         <Box>
@@ -223,20 +230,12 @@ export default function ProductsPage() {
             </Box>
 
             <Paper sx={{ p: 2, borderRadius: 2, mb: 3 }}>
-                <TextField 
-                    fullWidth 
-                    variant="outlined" 
-                    placeholder={t('products.searchPlaceholder')} 
-                    size="small"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon color="action" />
-                            </InputAdornment>
-                        ),
-                    }}
+                <SearchFilterBar 
+                    searchText={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    selectedTags={selectedFilterTags}
+                    onTagsChange={setSelectedFilterTags}
+                    allTags={allTags} 
                 />
             </Paper>
 
