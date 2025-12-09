@@ -17,7 +17,9 @@
     "refresh": "Refresh",
     "code": "Code",
     "name": "Name",
-    "delete": "Delete"
+    "delete": "Delete",
+    "actions": "Actions",
+    "noData": "No data available"
   },
   "products": {
     "title": "Products Management",
@@ -36,6 +38,8 @@
     "addUser": "Add User",
     "add": "Add User",
     "list": "User List",
-    "username": "Username"
+    "username": "Username",
+    "id": "ID",
+    "role": "Role"
   }
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField, Paper, Divider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import DataTable, { Column } from '@/modules/shared/components/DataTable/DataTable';
 
 export default function ProductsPage() {
     const { t } = useTranslation();
@@ -27,12 +28,18 @@ export default function ProductsPage() {
         loadData();
     };
 
+    const columns: Column<any>[] = [
+        { id: 'code', label: t('common.code') },
+        { id: 'name', label: t('common.name') },
+        // { id: 'description', label: t('common.description') }, // Optional
+    ];
+
     return (
         <Box sx={{ p: 4 }}>
             <Typography variant="h4" gutterBottom>{t('products.title')}</Typography>
             <Button variant="contained" onClick={loadData} sx={{ mb: 4 }}>{t('common.refresh')}</Button>
 
-            <Paper sx={{ p: 2, maxWidth: 600 }}>
+            <Paper sx={{ p: 2, maxWidth: 800 }}>
                 <Typography variant="h6">{t('products.addProduct')}</Typography>
                 <Box sx={{ mb: 2 }}>
                     <TextField 
@@ -55,14 +62,12 @@ export default function ProductsPage() {
                 </Box>
                 <Divider sx={{ mb: 2 }} />
                 <Typography variant="h6" sx={{ mb: 2 }}>{t('products.list')}</Typography>
-                {products.map(p => (
-                    <Box key={p.id} sx={{ mb: 1, borderBottom: '1px solid #eee', pb: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Typography variant="subtitle2">{p.name} ({p.code})</Typography>
-                            <Button size="small" color="error" onClick={() => handleDeleteProduct(p.id)}>{t('common.delete')}</Button>
-                        </Box>
-                    </Box>
-                ))}
+
+                <DataTable 
+                    columns={columns}
+                    data={products}
+                    onDelete={handleDeleteProduct}
+                />
             </Paper>
         </Box>
     );

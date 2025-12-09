@@ -17,7 +17,9 @@
     "refresh": "Actualiser",
     "code": "Code",
     "name": "Nom",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "actions": "Actions",
+    "noData": "Aucune donnée disponible"
   },
   "products": {
     "title": "Gestion des Produits",
@@ -36,6 +38,8 @@
     "addUser": "Ajouter un Utilisateur",
     "add": "Ajouter",
     "list": "Liste des Utilisateurs",
-    "username": "Nom d'utilisateur"
+    "username": "Nom d'utilisateur",
+    "id": "ID",
+    "role": "Rôle"
   }
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField, Paper, Divider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import DataTable, { Column } from '@/modules/shared/components/DataTable/DataTable';
 
 export default function ServicesPage() {
     const { t } = useTranslation();
@@ -27,12 +28,17 @@ export default function ServicesPage() {
         loadData();
     };
 
+    const columns: Column<any>[] = [
+        { id: 'code', label: t('common.code') },
+        { id: 'name', label: t('common.name') },
+    ];
+
     return (
         <Box sx={{ p: 4 }}>
             <Typography variant="h4" gutterBottom>{t('services.title')}</Typography>
             <Button variant="contained" onClick={loadData} sx={{ mb: 4 }}>{t('common.refresh')}</Button>
 
-            <Paper sx={{ p: 2, maxWidth: 600 }}>
+            <Paper sx={{ p: 2, maxWidth: 800 }}>
                 <Typography variant="h6">{t('services.addService')}</Typography>
                 <Box sx={{ mb: 2 }}>
                     <TextField 
@@ -55,14 +61,12 @@ export default function ServicesPage() {
                 </Box>
                 <Divider sx={{ mb: 2 }} />
                 <Typography variant="h6" sx={{ mb: 2 }}>{t('services.list')}</Typography>
-                {services.map(s => (
-                    <Box key={s.id} sx={{ mb: 1, borderBottom: '1px solid #eee', pb: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Typography variant="subtitle2">{s.name} ({s.code})</Typography>
-                            <Button size="small" color="error" onClick={() => handleDeleteService(s.id)}>{t('common.delete')}</Button>
-                        </Box>
-                    </Box>
-                ))}
+                
+                <DataTable 
+                    columns={columns}
+                    data={services}
+                    onDelete={handleDeleteService}
+                />
             </Paper>
         </Box>
     );
