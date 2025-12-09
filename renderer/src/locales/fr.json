@@ -12,5 +12,30 @@
     "title": "Accueil",
     "description": "Ceci est ta page d'accueil.",
     "counter": "Compteur: {{count}}"
+  },
+  "common": {
+    "refresh": "Actualiser",
+    "code": "Code",
+    "name": "Nom",
+    "delete": "Supprimer"
+  },
+  "products": {
+    "title": "Gestion des Produits",
+    "addProduct": "Ajouter un Produit",
+    "add": "Ajouter",
+    "list": "Liste des Produits"
+  },
+  "services": {
+    "title": "Gestion des Services",
+    "addService": "Ajouter un Service",
+    "add": "Ajouter",
+    "list": "Liste des Services"
+  },
+  "users": {
+    "title": "Gestion des Utilisateurs",
+    "addUser": "Ajouter un Utilisateur",
+    "add": "Ajouter",
+    "list": "Liste des Utilisateurs",
+    "username": "Nom d'utilisateur"
   }
 }

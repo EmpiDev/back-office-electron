@@ -12,5 +12,30 @@
     "title": "Home",
     "description": "This is your home page.",
     "counter": "Counter: {{count}}"
+  },
+  "common": {
+    "refresh": "Refresh",
+    "code": "Code",
+    "name": "Name",
+    "delete": "Delete"
+  },
+  "products": {
+    "title": "Products Management",
+    "addProduct": "Add Product",
+    "add": "Add Product",
+    "list": "Product List"
+  },
+  "services": {
+    "title": "Services Management",
+    "addService": "Add Service",
+    "add": "Add Service",
+    "list": "Service List"
+  },
+  "users": {
+    "title": "Users Management",
+    "addUser": "Add User",
+    "add": "Add User",
+    "list": "User List",
+    "username": "Username"
   }
 }
