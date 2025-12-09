@@ -33,7 +33,7 @@ export default function MainLayout() {
   };
 
   const menuItems = [
-    { text: t('app.nav.home') || 'Tableau de bord', icon: <DashboardIcon />, path: '/' }, // Fallback text until translations are updated
+    { text: t('app.nav.home') || 'Tableau de bord', icon: <DashboardIcon />, path: '/' },
     { text: t('app.nav.products') || 'Marchandises', icon: <InventoryIcon />, path: '/products' },
     { text: t('app.nav.services') || 'Services', icon: <ServiceIcon />, path: '/services' },
     { text: t('app.nav.users') || 'Utilisateurs', icon: <PeopleIcon />, path: '/users' },

@@ -2,6 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { app } = require('electron');
 const schema = require('./schema');
+const seedDatabase = require('./seeder');
 
 let db;
 
@@ -27,6 +28,7 @@ function initDB() {
           console.error('Schema execution failed', err);
         } else {
           console.log('Database schema initialized');
+          seedDatabase(db);
         }
       });
     }
