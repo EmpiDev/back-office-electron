@@ -3,7 +3,6 @@ import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material'
 import { Routes, Route, Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import JokesPage from '@/modules/jokes/pages/JokesPage'
 import DebugPage from '@/modules/debug/pages/DebugPage'
 import ProductsPage from '@/modules/products/pages/ProductsPage'
 import ServicesPage from '@/modules/services/pages/ServicesPage'
@@ -66,9 +65,6 @@ function App() {
           <Button color="inherit" component={Link} to="/users">
             {t('app.nav.users')}
           </Button>
-          <Button color="inherit" component={Link} to="/jokes">
-            {t('app.nav.jokes')}
-          </Button>
           <Button color="inherit" component={Link} to="/debug">
             Debug DB
           </Button>
@@ -88,7 +84,6 @@ function App() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/users" element={<UsersPage />} />
-          <Route path="/jokes" element={<JokesPage />} />
           <Route path="/debug" element={<DebugPage />} />
         </Routes>
       </Box>
