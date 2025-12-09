@@ -50,33 +50,6 @@ CREATE TABLE IF NOT EXISTS products (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Pricing Plans Table
--- Le cadrage commercial principal (Prix, Durée)
-CREATE TABLE IF NOT EXISTS pricing_plans (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    product_id INTEGER NOT NULL,
-    name TEXT NOT NULL, -- ex: "Standard", "Premium"
-    price REAL NOT NULL,
-    currency TEXT DEFAULT 'EUR',
-    billing_interval TEXT, -- ex: 'monthly', 'yearly', 'one-shot'
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-);
-
--- Options Table
--- Options additionnelles vendables avec un produit
-CREATE TABLE IF NOT EXISTS options (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tag TEXT NOT NULL UNIQUE,
-    name TEXT NOT NULL,
-    description TEXT,
-    price REAL,
-    unit TEXT, -- ex: 'Jours supplémentaires', 'TB Stockage'
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Tags Table
 CREATE TABLE IF NOT EXISTS tags (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,14 +70,7 @@ CREATE TABLE IF NOT EXISTS product_services (
     FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
 );
 
--- Join Table: Product <-> Option
-CREATE TABLE IF NOT EXISTS option_products (
-    product_id INTEGER NOT NULL,
-    option_id INTEGER NOT NULL,
-    PRIMARY KEY (product_id, option_id),
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    FOREIGN KEY (option_id) REFERENCES options(id) ON DELETE CASCADE
-);
+
 
 -- Join Table: Product <-> Tag
 CREATE TABLE IF NOT EXISTS product_tags (

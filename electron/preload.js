@@ -28,9 +28,7 @@ contextBridge.exposeInMainWorld("electronApi", {
     removeServiceFromProduct: (productId, serviceId) => ipcRenderer.invoke('products:remove-service', productId, serviceId),
     getServicesForProduct: (productId) => ipcRenderer.invoke('products:get-services-for-product', productId),
 
-    // Pricing Plans
-    getPlansByProductId: (productId) => ipcRenderer.invoke('products:get-plans', productId),
-    addPlanToProduct: (productId, plan) => ipcRenderer.invoke('products:add-plan', productId, plan),
+
 
     // Tags
     getTags: () => ipcRenderer.invoke('tags:get-all'),

@@ -32,16 +32,7 @@ export interface Product {
   updated_at?: string;
 }
 
-export interface PricingPlan {
-  id?: number;
-  product_id?: number;
-  name: string;
-  price: number;
-  currency?: string;
-  billing_interval?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+
 
 export interface Tag {
   id?: number;
@@ -74,11 +65,7 @@ declare global {
     createService: (service: Service) => Promise<Service>;
     updateService: (id: number, service: Service) => Promise<Service>;
     deleteService: (id: number) => Promise<void>;
-    // Services
-    getServices: () => Promise<Service[]>;
-    createService: (service: Service) => Promise<Service>;
-    updateService: (id: number, service: Service) => Promise<Service>;
-    deleteService: (id: number) => Promise<void>;
+
 
     // Products
     getProducts: () => Promise<Product[]>;
@@ -91,9 +78,7 @@ declare global {
     removeServiceFromProduct: (productId: number, serviceId: number) => Promise<void>;
     getServicesForProduct: (productId: number) => Promise<any[]>;
 
-    // Pricing Plans
-    getPlansByProductId: (productId: number) => Promise<PricingPlan[]>;
-    addPlanToProduct: (productId: number, plan: PricingPlan) => Promise<PricingPlan>;
+
 
     // Tags
     getTags: () => Promise<Tag[]>;

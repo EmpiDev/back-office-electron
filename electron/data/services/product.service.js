@@ -87,36 +87,12 @@ const getServicesForProduct = async (productId) => {
     return await dbAll(sql, [productId]);
 };
 
-// --- Sub-Resources: Pricing Plans ---
-
-const getPlansByProductId = async (productId) => {
-    const sql = `SELECT * FROM pricing_plans WHERE product_id = ?`;
-    return await dbAll(sql, [productId]);
-};
-
-const addPlanToProduct = async (productId, plan) => {
-    const sql = `
-        INSERT INTO pricing_plans (product_id, name, price, currency, billing_interval)
-        VALUES (?, ?, ?, ?, ?)
-    `;
-    const result = await dbRun(sql, [
-        productId,
-        plan.name,
-        plan.price,
-        plan.currency || 'EUR',
-        plan.billing_interval
-    ]);
-    return { id: result.id, product_id: productId, ...plan };
-};
-
 module.exports = {
     createProduct,
     getAllProducts,
     getProductById,
     updateProduct,
     deleteProduct,
-    getPlansByProductId,
-    addPlanToProduct,
     addServiceToProduct,
     removeServiceFromProduct,
     getServicesForProduct
