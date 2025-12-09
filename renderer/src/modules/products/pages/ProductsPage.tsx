@@ -35,7 +35,7 @@ export default function ProductsPage() {
     ];
 
     return (
-        <Box sx={{ p: 4 }}>
+        <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography variant="h4" gutterBottom>{t('products.title')}</Typography>
             <Button variant="contained" onClick={loadData} sx={{ mb: 4 }}>{t('common.refresh')}</Button>
 
