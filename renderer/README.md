@@ -7,24 +7,38 @@ Cette application utilise Vite + React + TypeScript avec une architecture modula
 - `modules/` : modules **fonctionnels** et partagés
   - `products/` : module de gestion des produits
     - `pages/`
-      - `ProductsPage.tsx` : page principale de gestion/affichage des produits.
+      - `ProductsPage.tsx` : page principale. Utilise le composant partagé `DataTable`.
   - `services/` : module de gestion des services
     - `pages/`
-      - `ServicesPage.tsx` : page principale de gestion/affichage des services.
+      - `ServicesPage.tsx` : page principale. Utilise le composant partagé `DataTable`.
   - `users/` : module de gestion des utilisateurs
     - `pages/`
-      - `UsersPage.tsx` : page principale de gestion/affichage des utilisateurs.
+      - `UsersPage.tsx` : page principale. Utilise le composant partagé `DataTable`.
   - `debug/` : module de debug
     - `pages/`
-      - `DebugPage.tsx` : page pour le debug de la base de données.
+      - `DebugPage.tsx` : page pour le debug brut de la base de données.
   - `shared/` : éléments génériques et réutilisables
-    - `components/` : futurs composants transverses (ex : `ActionMenu/ActionMenu.tsx`…)
+    - `components/`
+      - `DataTable/`
+        - `DataTable.tsx` : Tableau générique (MUI) avec support de colonnes dynamiques et actions (suppression).
 
 - `services/` : couche métier / données (API, stockage, etc.)
-  - *Les services spécifiques à chaque domaine (products, services, users) seront ajoutés ici si nécessaire pour isoler la logique.*
+  - *Les services spécifiques à chaque domaine (products, services, users) seront ajoutés ici si nécessaire pour isoler la logique complexe.*
 
 - `config/` : configuration applicative (ex. `appConfig.js`).
+- `locales/` : Fichiers de traduction (`en.json`, `fr.json`).
 - `types/` : types globaux (par ex. `electron-api.d.ts` pour `window.electronApi`).
+
+## Fonctionnalités Clés
+
+### Internationalisation (i18n)
+- L'application utilise `i18next` et `react-i18next`.
+- Les traductions sont stockées dans `src/locales/`.
+- Un bouton dans la barre de navigation permet de basculer instantanément entre Français et Anglais.
+- Les hooks `useTranslation` sont utilisés dans les composants pour l'affichage dynamique des textes.
+
+### Composants Partagés
+- **DataTable** : Un tableau standardisé utilisé par les modules `products`, `services` et `users` pour afficher les listes, assurant une cohérence visuelle et fonctionnelle (affichage des colonnes, bouton supprimer, message "aucune donnée").
 
 ## Principes d'architecture
 
@@ -47,13 +61,13 @@ Les services sont rassemblés dans `services/` et ne dépendent jamais des compo
 3. **Modules et Shared**
 
 - `modules/*` regroupe les fonctionnalités par domaine (ex: `products`, `services`) ainsi que le code partagé.
-- `modules/shared` contient les briques UI et utilitaires réutilisables partout (boutons, menus, hooks outils, helpers…).
+- `modules/shared` contient les briques UI et utilitaires réutilisables partout.
 
 4. **Flux typique**
 
 - une page (ex. `ProductsPage`) appelle l'API Electron (`window.electronApi`) pour récupérer des données,
 - l'API Electron communique avec le processus main qui interagit avec la base de données SQLite,
-- la page récupère ces données et les affiche via des composants,
+- la page récupère ces données et les affiche via des composants (comme `DataTable`),
 - les tests valident séparément le rendu et la logique.
 
 Cette organisation vise à :
