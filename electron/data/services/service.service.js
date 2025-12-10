@@ -5,10 +5,10 @@ const { dbRun, dbGet, dbAll } = require('../db-helper');
 // Create
 const createService = async (service) => {
     const sql = `
-        INSERT INTO services(name, description, unit, category_id)
-        VALUES(?, ?, ?, ?)
+        INSERT INTO services(name, description, category_id)
+        VALUES(?, ?, ?)
     `;
-    const result = await dbRun(sql, [service.name, service.description, service.unit, service.category_id]);
+    const result = await dbRun(sql, [service.name, service.description, service.category_id]);
     return { id: result.id, ...service };
 };
 
@@ -37,10 +37,10 @@ const getServiceById = async (id) => {
 const updateService = async (id, service) => {
     const sql = `
         UPDATE services
-        SET name = ?, description = ?, unit = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP
+        SET name = ?, description = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
     `;
-    await dbRun(sql, [service.name, service.description, service.unit, service.category_id, id]);
+    await dbRun(sql, [service.name, service.description, service.category_id, id]);
     return await getServiceById(id);
 };
 

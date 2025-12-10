@@ -299,7 +299,7 @@ export default function ProductsPage() {
                         <Box sx={{ mb: 2 }}>
                             <Autocomplete
                                 options={allServices.filter(s => !selectedServicesInForm.some(selected => selected.serviceId === s.id))}
-                                getOptionLabel={(option) => `${option.name} (${option.unit || 'unité'})`}
+                                getOptionLabel={(option) => `${option.name}`}
                                 value={null}
                                 onChange={(_, newValue) => {
                                     if (newValue) {
@@ -323,7 +323,7 @@ export default function ProductsPage() {
                                 return (
                                     <Paper key={selected.serviceId} variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <Typography variant="body1" sx={{ flexGrow: 1 }}>
-                                            {service.name} <Typography component="span" variant="caption" color="text.secondary">({service.unit || 'unité'})</Typography>
+                                            {service.name}
                                         </Typography>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <TextField

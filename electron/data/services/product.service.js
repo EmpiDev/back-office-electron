@@ -79,7 +79,7 @@ const removeServiceFromProduct = async (productId, serviceId) => {
 // Get Services associated with a Product
 const getServicesForProduct = async (productId) => {
     const sql = `
-        SELECT ps.service_id, ps.quantity, s.name, s.description, s.unit
+        SELECT ps.service_id, ps.quantity, s.name, s.description
         FROM product_services ps
         JOIN services s ON ps.service_id = s.id
         WHERE ps.product_id = ?

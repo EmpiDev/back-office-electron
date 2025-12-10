@@ -25,8 +25,6 @@ CREATE TABLE IF NOT EXISTS services (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     description TEXT,
-    -- Unité de l'intervention (ex: 'Jours', 'Heures', 'Forfait', 'Ticket', 'Utilisateur')
-    unit TEXT, 
     category_id INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,

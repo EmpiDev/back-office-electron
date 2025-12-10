@@ -28,7 +28,6 @@ erDiagram
         int id PK
         string name
         string description
-        string unit
         int category_id FK
     }
 
@@ -78,7 +77,6 @@ Comptes permettant l'accès au Back-Office.
 
 ### Services
 Briques de base de l'offre Cyna.
-- **unit** : Unité de mesure (ex: Jours, Heures).
 - **category_id** : Lien vers la catégorie.
 
 ### Categories

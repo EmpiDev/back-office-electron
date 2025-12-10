@@ -12,10 +12,10 @@ const initialData = {
         { name: 'Training', description: 'Professional training and workshops' }
     ],
     services: [
-        { name: 'Level 1 Support', description: 'Basic email support', unit: 'Ticket', category_name: 'Support', tags: ['Support', 'Business Hours'] },
-        { name: 'Security Audit', description: 'Full infrastructure audit', unit: 'Day', category_name: 'Security', tags: ['Security', 'Audit', 'Compliance'] },
-        { name: 'Web Development', description: 'React/Node development', unit: 'Day', category_name: 'Development', tags: ['Development', 'Web'] },
-        { name: 'SOC Monitoring', description: '24/7 Security Monitoring', unit: 'Month', category_name: 'Security', tags: ['Security', 'Monitoring', 'SIEM', '24/7'] }
+        { name: 'Level 1 Support', description: 'Basic email support', category_name: 'Support', tags: ['Support', 'Business Hours'] },
+        { name: 'Security Audit', description: 'Full infrastructure audit', category_name: 'Security', tags: ['Security', 'Audit', 'Compliance'] },
+        { name: 'Web Development', description: 'React/Node development', category_name: 'Development', tags: ['Development', 'Web'] },
+        { name: 'SOC Monitoring', description: '24/7 Security Monitoring', category_name: 'Security', tags: ['Security', 'Monitoring', 'SIEM', '24/7'] }
     ],
     products: [
         {
@@ -140,8 +140,8 @@ function seedDatabase(db) {
                     const cat = await get("SELECT id FROM categories WHERE name = ?", [srv.category_name]);
                     const catId = cat ? cat.id : null;
 
-                    await run("INSERT INTO services (name, description, unit, category_id) VALUES (?, ?, ?, ?)",
-                        [srv.name, srv.description, srv.unit, catId]);
+                    await run("INSERT INTO services (name, description, category_id) VALUES (?, ?, ?)",
+                        [srv.name, srv.description, catId]);
                     console.log(`Service seeded: ${srv.name}`);
                 }
             }
