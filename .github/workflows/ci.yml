@@ -1,0 +1,58 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-renderer:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./renderer
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: renderer/package-lock.json
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Run Tests
+      # We need to ensure the test script is added to package.json first
+      run: npm run test
+
+  build-app:
+    needs: test-renderer
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: package-lock.json
+        
+    - name: Install Root Dependencies
+      run: npm install
+      
+    - name: Install Renderer Dependencies
+      run: |
+        cd renderer
+        npm install
+        
+    - name: Build Electron App
+      run: npm run build
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
