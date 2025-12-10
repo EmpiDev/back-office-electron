@@ -11,7 +11,7 @@ export default function ServicesPage() {
     const [services, setServices] = useState<any[]>([]);
     const [allTags, setAllTags] = useState<any[]>([]);
     const [openDialog, setOpenDialog] = useState(false);
-    const [newService, setNewService] = useState({ tag: '', name: '', description: '', category_id: null });
+    const [newService, setNewService] = useState({ name: '', description: '', category_id: null });
     const [selectedTagsInForm, setSelectedTagsInForm] = useState<number[]>([]);
     const [editingServiceId, setEditingServiceId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -37,7 +37,7 @@ export default function ServicesPage() {
 
     const handleOpenCreateDialog = () => {
         setEditingServiceId(null);
-        setNewService({ tag: '', name: '', description: '', category_id: null });
+        setNewService({ name: '', description: '', category_id: null });
         setSelectedTagsInForm([]);
         setOpenDialog(true);
     };
@@ -45,7 +45,6 @@ export default function ServicesPage() {
     const handleEditService = async (service: any) => {
         setEditingServiceId(service.id);
         setNewService({
-            tag: service.tag,
             name: service.name,
             description: service.description || '',
             category_id: service.category_id
@@ -91,7 +90,7 @@ export default function ServicesPage() {
             }
         }
         
-        setNewService({ tag: '', name: '', description: '', category_id: null });
+        setNewService({ name: '', description: '', category_id: null });
         setSelectedTagsInForm([]);
         setEditingServiceId(null);
         setOpenDialog(false);

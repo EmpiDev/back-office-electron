@@ -15,6 +15,13 @@
         "description": "This is your home page.",
         "counter": "Counter: {{count}}"
     },
+    "dashboard": {
+        "totalProducts": "Products",
+        "totalUsers": "Users",
+        "totalServices": "Services",
+        "totalSales": "Sales (Month)",
+        "growth": "Growth"
+    },
     "common": {
         "refresh": "Refresh",
         "tag": "Tag",

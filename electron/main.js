@@ -9,6 +9,7 @@ const serviceService = require('./data/services/service.service');
 const productService = require('./data/services/product.service');
 const tagService = require('./data/services/tag.service');
 const categoryService = require('./data/services/category.service');
+const dashboardService = require('./data/services/dashboard.service');
 
 const APP_NAME = "Mon app";
 
@@ -151,9 +152,14 @@ ipcMain.handle('categories:delete', async (_event, id) => {
     return await categoryService.deleteCategory(id);
 });
 
+// Dashboard
+ipcMain.handle('dashboard:get-stats', async () => {
+    return await dashboardService.getDashboardStats();
+});
+
 
 app.whenReady().then(() => {
-    initDB();
     app.setName(APP_NAME);
+    initDB();
     createWindow();
 });

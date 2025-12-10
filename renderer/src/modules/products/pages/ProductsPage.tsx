@@ -12,7 +12,7 @@ export default function ProductsPage() {
     const [allServices, setAllServices] = useState<any[]>([]); // New state for all available services
     const [allTags, setAllTags] = useState<any[]>([]); // State for all available tags
     const [openDialog, setOpenDialog] = useState(false);
-    const [newProduct, setNewProduct] = useState<any>({ tag: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Updated fields
+    const [newProduct, setNewProduct] = useState<any>({ name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Updated fields
     const [selectedServicesInForm, setSelectedServicesInForm] = useState<Array<{ serviceId: number; quantity: number }>>([]); // New state for selected services
     const [selectedTagsInForm, setSelectedTagsInForm] = useState<number[]>([]); // State for selected tags (now auto-calculated)
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
@@ -59,7 +59,7 @@ export default function ProductsPage() {
 
     const handleOpenCreateDialog = () => {
         setEditingProductId(null);
-        setNewProduct({ tag: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' });
+        setNewProduct({ name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' });
         setSelectedServicesInForm([]);
         setSelectedTagsInForm([]);
         setOpenDialog(true);
@@ -68,7 +68,6 @@ export default function ProductsPage() {
     const handleEditProduct = async (product: any) => {
         setEditingProductId(product.id);
         setNewProduct({ 
-            tag: product.tag, 
             name: product.name, 
             description: product.description, 
             target_segment: product.target_segment, 
@@ -135,7 +134,7 @@ export default function ProductsPage() {
             }
         }
         
-        setNewProduct({ tag: '', name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Reset form
+        setNewProduct({ name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Reset form
         setSelectedServicesInForm([]); // Reset selected services
         setSelectedTagsInForm([]); // Reset selected tags
         setEditingProductId(null);

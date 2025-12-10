@@ -15,6 +15,13 @@
         "description": "Ceci est ta page d'accueil.",
         "counter": "Compteur: {{count}}"
     },
+    "dashboard": {
+        "totalProducts": "Produits",
+        "totalUsers": "Utilisateurs",
+        "totalServices": "Services",
+        "totalSales": "Ventes (Mois)",
+        "growth": "Croissance"
+    },
     "common": {
         "refresh": "Actualiser",
         "tag": "Tag",
