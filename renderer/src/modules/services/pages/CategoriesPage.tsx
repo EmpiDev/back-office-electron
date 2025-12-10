@@ -51,8 +51,8 @@ export default function CategoriesPage() {
     };
 
     const columns: Column<any>[] = [
-        { id: 'name', label: t('common.name') || 'Nom' },
-        { id: 'description', label: t('common.description') || 'Description' },
+        { id: 'name', label: t('common.name') || 'Nom', sortable: true },
+        { id: 'description', label: t('common.description') || 'Description', sortable: true },
     ];
 
     const filteredCategories = categories.filter(c => 

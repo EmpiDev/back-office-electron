@@ -173,6 +173,7 @@ export default function ProductsPage() {
         {
             id: 'is_top_product',
             label: t('products.topProduct'),
+            sortable: true,
             render: (row) => (
                 <Tooltip title={row.is_top_product ? t('products.removeTopProduct') : t('products.addTopProduct')}>
                     <IconButton 
@@ -184,10 +185,10 @@ export default function ProductsPage() {
                 </Tooltip>
             )
         },
-        { id: 'name', label: t('common.name') },
-        { id: 'description', label: t('common.description') },
-        { id: 'price', label: t('common.price'), render: (row) => `${row.price} €` },
-        { id: 'payment_type', label: t('common.paymentType'), format: (value) => value === 'monthly' ? t('products.paymentTypes.monthly') : t('products.paymentTypes.oneTime') },
+        { id: 'name', label: t('common.name'), sortable: true },
+        { id: 'description', label: t('common.description'), sortable: true },
+        { id: 'price', label: t('common.price'), render: (row) => `${row.price} €`, sortable: true },
+        { id: 'payment_type', label: t('common.paymentType'), format: (value) => value === 'monthly' ? t('products.paymentTypes.monthly') : t('products.paymentTypes.oneTime'), sortable: true },
         // { id: 'description', label: t('common.description') }, // Optional
     ];
 

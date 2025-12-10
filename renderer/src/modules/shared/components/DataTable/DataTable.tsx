@@ -9,7 +9,8 @@ import {
     Paper,
     TableContainer,
     TextField,
-    Box
+    Box,
+    TableSortLabel
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
@@ -20,6 +21,7 @@ export interface Column<T> {
     render?: (row: T) => React.ReactNode;
     align?: 'left' | 'right' | 'center';
     filterable?: boolean;
+    sortable?: boolean;
 }
 
 interface DataTableProps<T> {
@@ -32,12 +34,20 @@ interface DataTableProps<T> {
 export default function DataTable<T extends { id: number }>({ columns, data, onDelete, onEdit }: DataTableProps<T>) {
     const { t } = useTranslation();
     const [filters, setFilters] = useState<Record<string, string>>({});
+    const [orderBy, setOrderBy] = useState<keyof T | string>('');
+    const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
     const handleFilterChange = (colId: string, value: string) => {
         setFilters(prev => ({
             ...prev,
             [colId]: value
         }));
+    };
+
+    const handleRequestSort = (property: keyof T | string) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
     };
 
     const filteredData = data.filter(row => {
@@ -49,14 +59,43 @@ export default function DataTable<T extends { id: number }>({ columns, data, onD
         });
     });
 
+    const sortedData = [...filteredData].sort((a, b) => {
+        if (!orderBy) return 0;
+        
+        const aValue = (a as any)[orderBy];
+        const bValue = (b as any)[orderBy];
+
+        if (bValue < aValue) {
+            return order === 'asc' ? 1 : -1;
+        }
+        if (bValue > aValue) {
+            return order === 'asc' ? -1 : 1;
+        }
+        return 0;
+    });
+
     return (
         <TableContainer component={Paper} variant="outlined" sx={{ mt: 2 }}>
             <Table size="small">
                 <TableHead>
                     <TableRow>
                         {columns.map((col) => (
-                            <TableCell key={String(col.id)} align={col.align || 'left'}>
-                                {col.label}
+                            <TableCell 
+                                key={String(col.id)} 
+                                align={col.align || 'left'}
+                                sortDirection={orderBy === col.id ? order : false}
+                            >
+                                {col.sortable ? (
+                                    <TableSortLabel
+                                        active={orderBy === col.id}
+                                        direction={orderBy === col.id ? order : 'asc'}
+                                        onClick={() => handleRequestSort(col.id)}
+                                    >
+                                        {col.label}
+                                    </TableSortLabel>
+                                ) : (
+                                    col.label
+                                )}
                                 {col.filterable && (
                                     <Box sx={{ mt: 1 }} onClick={(e) => e.stopPropagation()}>
                                         <TextField 
@@ -75,7 +114,7 @@ export default function DataTable<T extends { id: number }>({ columns, data, onD
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {filteredData.map((row) => (
+                    {sortedData.map((row) => (
                         <TableRow key={row.id}>
                             {columns.map((col) => (
                                 <TableCell key={String(col.id)} align={col.align || 'left'}>

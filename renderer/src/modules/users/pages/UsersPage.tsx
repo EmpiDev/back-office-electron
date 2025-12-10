@@ -58,9 +58,9 @@ export default function UsersPage() {
     };
 
     const columns: Column<any>[] = [
-        { id: 'id', label: t('users.id') },
-        { id: 'username', label: t('users.username') },
-        { id: 'role', label: t('users.role') },
+        { id: 'id', label: t('users.id'), sortable: true },
+        { id: 'username', label: t('users.username'), sortable: true },
+        { id: 'role', label: t('users.role'), sortable: true },
     ];
 
     const filteredUsers = users.filter(u => 

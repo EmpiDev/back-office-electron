@@ -114,7 +114,7 @@ export default function ServicesPage() {
                 </Box>
             )
         },
-        { id: 'name', label: t('common.name') },
+        { id: 'name', label: t('common.name'), sortable: true },
     ];
 
     const filteredServices = services.filter(service => {

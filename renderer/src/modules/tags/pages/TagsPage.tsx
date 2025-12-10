@@ -51,7 +51,7 @@ export default function TagsPage() {
     };
 
     const columns: Column<any>[] = [
-        { id: 'name', label: t('tags.nameLabel') },
+        { id: 'name', label: t('tags.nameLabel'), sortable: true },
     ];
 
     const filteredTags = tags.filter(t => 
