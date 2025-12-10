@@ -59,7 +59,9 @@
         "noInheritedTags": "No tags (select services to see associated tags)",
         "topProduct": "Top Product",
         "addTopProduct": "Add to Top Products",
-        "removeTopProduct": "Remove from Top Products"
+        "removeTopProduct": "Remove from Top Products",
+        "addService": "Add Service",
+        "searchService": "Search for a service..."
     },
     "services": {
         "title": "Services Management",

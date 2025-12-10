@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, FormGroup, FormControlLabel, Chip, IconButton, Tooltip } from '@mui/material';
-import { Add as AddIcon, Search as SearchIcon, CloudDownload as DownloadIcon, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
+import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, FormGroup, FormControlLabel, Chip, IconButton, Tooltip, Autocomplete } from '@mui/material';
+import { Add as AddIcon, Search as SearchIcon, CloudDownload as DownloadIcon, Star as StarIcon, StarBorder as StarBorderIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { Tag } from '../../../types/electron-api';
 import SearchFilterBar from '../../shared/components/SearchFilterBar';
@@ -295,32 +295,53 @@ export default function ProductsPage() {
                         </Grid>
                         
                         <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>{t('products.selectServices')}</Typography>
-                        <FormGroup>
-                            {allServices.map((service) => (
-                                <Box key={service.id} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                checked={selectedServicesInForm.some(s => s.serviceId === service.id)}
-                                                onChange={(e) => handleServiceSelection(service.id, e.target.checked)}
-                                            />
-                                        }
-                                        label={`${service.name} (${service.unit || 'unité'})`}
+                        <Box sx={{ mb: 2 }}>
+                            <Autocomplete
+                                options={allServices.filter(s => !selectedServicesInForm.some(selected => selected.serviceId === s.id))}
+                                getOptionLabel={(option) => `${option.name} (${option.unit || 'unité'})`}
+                                value={null}
+                                onChange={(_, newValue) => {
+                                    if (newValue) {
+                                        handleServiceSelection(newValue.id, true);
+                                    }
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label={t('products.addService')}
+                                        placeholder={t('products.searchService')}
                                     />
-                                    {selectedServicesInForm.some(s => s.serviceId === service.id) && (
-                                        <TextField
-                                            type="number"
-                                            label={t('common.quantity')}
-                                            value={selectedServicesInForm.find(s => s.serviceId === service.id)?.quantity || 1}
-                                            onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value, 10))}
-                                            size="small"
-                                            sx={{ ml: 2, width: 80 }}
-                                            InputProps={{ inputProps: { min: 1 } }}
-                                        />
-                                    )}
-                                </Box>
-                            ))}
-                        </FormGroup>
+                                )}
+                            />
+                        </Box>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            {selectedServicesInForm.map((selected) => {
+                                const service = allServices.find(s => s.id === selected.serviceId);
+                                if (!service) return null;
+                                return (
+                                    <Paper key={selected.serviceId} variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <Typography variant="body1" sx={{ flexGrow: 1 }}>
+                                            {service.name} <Typography component="span" variant="caption" color="text.secondary">({service.unit || 'unité'})</Typography>
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <TextField
+                                                type="number"
+                                                label={t('common.quantity')}
+                                                value={selected.quantity}
+                                                onChange={(e) => handleServiceQuantityChange(selected.serviceId, parseInt(e.target.value, 10))}
+                                                size="small"
+                                                sx={{ width: 100 }}
+                                                InputProps={{ inputProps: { min: 1 } }}
+                                            />
+                                            <IconButton onClick={() => handleServiceSelection(selected.serviceId, false)} color="error" size="small">
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </Box>
+                                    </Paper>
+                                );
+                            })}
+                        </Box>
 
                         <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>{t('products.inheritedTags')}</Typography>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
