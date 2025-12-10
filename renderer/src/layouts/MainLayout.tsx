@@ -22,7 +22,7 @@ export default function MainLayout() {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
@@ -52,9 +52,11 @@ export default function MainLayout() {
         </Toolbar>
       </AppBar>
 
-      <Container component="main" maxWidth="xl" sx={{ flexGrow: 1, p: 3, mt: 2 }}>
-        <Outlet />
-      </Container>
+      <Box component="main" sx={{ flexGrow: 1, overflow: 'auto', p: 3 }}>
+        <Container maxWidth="xl">
+            <Outlet />
+        </Container>
+      </Box>
     </Box>
   );
 }
