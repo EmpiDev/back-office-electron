@@ -4,23 +4,26 @@ Cette application utilise Vite + React + TypeScript avec une architecture modula
 
 ## Structure générale
 
-- `modules/` : modules **fonctionnels** et partagés
-  - `products/` : module de gestion des produits
+  - `dashboard/` : vue d'ensemble et statistiques (graphiques via Recharts).
     - `pages/`
-      - `ProductsPage.tsx` : page principale. Utilise le composant partagé `DataTable`.
-  - `services/` : module de gestion des services
+      - `DashboardPage.tsx`
+  - `products/` : gestion des produits et showcases
     - `pages/`
-      - `ServicesPage.tsx` : page principale. Utilise le composant partagé `DataTable`.
-  - `users/` : module de gestion des utilisateurs
+      - `ProductsPage.tsx` : liste des produits.
+      - `ShowcasePage.tsx` : gestion de la vitrine (carrousel, top produits).
+  - `services/` : gestion des services et catégories
     - `pages/`
-      - `UsersPage.tsx` : page principale. Utilise le composant partagé `DataTable`.
-  - `debug/` : module de debug
+      - `ServicesPage.tsx` : liste des services.
+  - `users/` : gestion des utilisateurs
     - `pages/`
-      - `DebugPage.tsx` : page pour le debug brut de la base de données.
+      - `UsersPage.tsx` : liste des utilisateurs.
+  - `tags/` : gestion des tags
+    - `pages/`
+      - `TagsPage.tsx` : liste et création de tags.
   - `shared/` : éléments génériques et réutilisables
     - `components/`
       - `DataTable/`
-        - `DataTable.tsx` : Tableau générique (MUI) avec support de colonnes dynamiques et actions (suppression).
+        - `DataTable.tsx` : Tableau générique (MUI) avec support de colonnes dynamiques et actions.
 
 - `services/` : couche métier / données (API, stockage, etc.)
   - *Les services spécifiques à chaque domaine (products, services, users) seront ajoutés ici si nécessaire pour isoler la logique complexe.*

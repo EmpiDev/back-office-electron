@@ -11,7 +11,13 @@ Cette application est construite avec **Electron**, **React**, **TypeScript** et
 
 ### Installation
 ```bash
+# Installation des dépendances Electron (racine)
 npm install
+
+# Installation des dépendances React (renderer)
+cd renderer
+npm install
+cd ..
 ```
 
 ### Lancement en développement
@@ -20,11 +26,19 @@ Pour lancer à la fois le processus Electron et le serveur de développement Rea
 npm run dev
 ```
 
-##  Structure du Projet
+## Fonctionnalités Principales
 
-- `electron/` : Code du processus principal Electron et gestion de la base de données SQLite.
-- `renderer/` : Code de l'interface utilisateur (React + Vite).
-- `docs/` : Documentation technique détaillée.
+- **Dashboard** : Vue d'ensemble des statistiques clés (revenus, produits vendus, etc.).
+- **Produits** : Gestion complète (CRUD), vitrine (Showcase), produits phares et carrousel.
+- **Services** : Gestion des services unitaires et catégories associées.
+- **Utilisateurs** : Gestion des accès administrateurs.
+- **Tags** : Système de marquage transversal pour organiser produits et services.
+
+## Structure du Projet
+
+- `electron/` : Backend (Processus principal, API SQLite, Services métier).
+- `renderer/` : Frontend (React, Material UI, Vite).
+- `docs/` : Documentation technique (Architecture, Modèles, Cas d'usage).
 
 ##  Documentation Technique
 
