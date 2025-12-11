@@ -24,15 +24,8 @@ export default function ShowcasePage() {
     const loadData = async () => {
         const p = await window.electronApi.getProducts();
         
-        // Fetch tags for filtering
         const tags = await window.electronApi.getTags();
-        // Since we need to know product tags for filtering, and getProducts() might only return product data...
-        // Does getProducts return tags? The seeder/service implementation of getProducts usually returns tags if joined.
-        // Let's check Product Service. If not, we might need to fetch them.
-        // Assuming products have tags property or we need to fetch. 
-        // Based on ProductsPage, we fetched tags separately? NO, ProductsPage fetches tags for each product manually in `loadData`.
-        // I need to do the same here to ensure filtering works!
-        
+
         const productsWithTags = await Promise.all(p.map(async (product: any) => {
              const productTags = await window.electronApi.getTagsForProduct(product.id);
              return { ...product, tags: productTags };
@@ -138,7 +131,6 @@ export default function ShowcasePage() {
                     </Paper>
                 </Grid>
 
-                {/* All Other Products Section */}
                 <Grid size={{ xs: 12 }}>
                     <Paper sx={{ p: 2, borderRadius: 2, mt: 2 }}>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, flexWrap: 'wrap', gap: 2 }}>
@@ -154,9 +146,6 @@ export default function ShowcasePage() {
                                 />
                             </Box>
                             <Box sx={{ mt: 5 }}> 
-                                {/* Margin top to align with search bar effectively or just side by side? 
-                                    SearchFilterBar has mb: 3. Let's just put Sort in a nice place.
-                                */}
                                 <FormControl size="small" sx={{ minWidth: 120 }}>
                                     <Select
                                         value={sortBy}
