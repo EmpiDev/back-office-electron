@@ -46,6 +46,25 @@ graph TD
 - Sécurise la communication entre le rendu (web) et le main (node).
 - Expose une API typée (`window.electron`) qui permet au React d'appeler des fonctions backend sans accès direct à Node.js.
 
+## Organisation du Backend (Data Layer)
+
+Le dossier `electron/data/` concentre la logique d'accès aux données et la gestion de la base SQLite.
+
+### Structure des Fichiers
+
+- **`database.js`** : Point d'entrée. Initialise la connexion, crée les tables et gère les migrations.
+- **`schema.js`** : Contient les définitions SQL des tables (`CREATE TABLE`).
+- **`seeder.js`** : Script de peuplement (fixtures) pour l'initialisation (Admin, données de test).
+- **`db-helper.js`** : Utilitaires (`dbRun`, `dbGet`, `dbAll`) transformant les callbacks SQLite en Promises.
+- **`services/`** : Modules de logique métier (ex: `product.service.js`, `user.service.js`).
+
+### Guide : Ajouter une nouvelle entité
+
+1. **Schéma** : Ajouter la définition de la table dans `electron/data/schema.js`.
+2. **Service** : Créer un fichier de service dans `electron/data/services/` (ex: `new-entity.service.js`).
+3. **Seeder** : Ajouter des données initiales dans `electron/data/seeder.js` (optionnel).
+4. **IPC** : Exposer les méthodes via IPC dans `electron/main.js` pour qu'elles soient accessibles par le frontend.
+
 ## Flux de Données Typique (Ex: Création d'un Produit)
 1. L'utilisateur remplit le formulaire sur la page `ProductsPage`.
 2. Le composant React appelle `window.electron.createProduct(data)`.
