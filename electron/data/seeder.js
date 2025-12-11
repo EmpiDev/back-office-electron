@@ -9,13 +9,17 @@ const initialData = {
         { name: 'Development', description: 'Software development' },
         { name: 'Security', description: 'Cybersecurity services' },
         { name: 'Infrastructure', description: 'Cloud and On-Premise infrastructure' },
-        { name: 'Training', description: 'Professional training and workshops' }
+        { name: 'Training', description: 'Professional training and workshops' },
+        { name: 'Maintenance', description: 'Hardware and Software maintenance' },
+        { name: 'Marketing', description: 'Digital marketing and SEO' }
     ],
     services: [
         { name: 'Level 1 Support', description: 'Basic email support', category_name: 'Support', tags: ['Support', 'Business Hours'] },
         { name: 'Security Audit', description: 'Full infrastructure audit', category_name: 'Security', tags: ['Security', 'Audit', 'Compliance'] },
         { name: 'Web Development', description: 'React/Node development', category_name: 'Development', tags: ['Development', 'Web'] },
-        { name: 'SOC Monitoring', description: '24/7 Security Monitoring', category_name: 'Security', tags: ['Security', 'Monitoring', 'SIEM', '24/7'] }
+        { name: 'SOC Monitoring', description: '24/7 Security Monitoring', category_name: 'Security', tags: ['Security', 'Monitoring', 'SIEM', '24/7'] },
+        { name: 'Server Maintenance', description: 'Monthly server patching and updates', category_name: 'Maintenance', tags: ['Maintenance', 'Infrastructure'] },
+        { name: 'SEO Optimization', description: 'Website ranking improvement', category_name: 'Marketing', tags: ['Marketing', 'Web'] }
     ],
     products: [
         {
@@ -90,7 +94,9 @@ const initialData = {
         { name: 'Development' },
         { name: 'Web' },
         { name: 'Support' },
-        { name: 'Audit' }
+        { name: 'Audit' },
+        { name: 'Maintenance' },
+        { name: 'Marketing' }
     ]
 };
 

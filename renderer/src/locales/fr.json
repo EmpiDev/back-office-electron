@@ -40,7 +40,12 @@
         "search": "Rechercher",
         "filterByTags": "Filtrer par tags",
         "sortByName": "Nom",
-        "sortByPrice": "Prix"
+        "sortByPrice": "Prix",
+        "category": "Catégorie",
+        "categories": "Catégories",
+        "selectCategory": "Sélectionner une catégorie",
+        "filterByCategories": "Filtrer par catégories",
+        "noCategoriesAvailable": "Aucune catégorie disponible"
     },
     "products": {
         "title": "Gestion des Produits",
@@ -60,7 +65,16 @@
         "addTopProduct": "Ajouter aux Top Produits",
         "removeTopProduct": "Retirer des Top Produits",
         "addService": "Ajouter un service",
-        "searchService": "Rechercher un service..."
+        "searchService": "Rechercher un service...",
+        "messages": {
+            "loadError": "Échec du chargement des produits",
+            "created": "Produit créé avec succès",
+            "updated": "Produit mis à jour avec succès",
+            "deleted": "Produit supprimé avec succès",
+            "createError": "Échec de la création du produit",
+            "updateError": "Échec de la mise à jour du produit",
+            "deleteError": "Échec de la suppression du produit"
+        }
     },
     "services": {
         "title": "Gestion des Services",
@@ -71,7 +85,16 @@
         "tagsLabel": "Tags",
         "tagsPlaceholder": "Sélectionner des tags existants",
         "noTagsAvailable": "Aucun tag disponible - créez-en dans la page Tags",
-        "goToTagsPage": "Allez dans la page Tags pour créer des tags"
+        "goToTagsPage": "Allez dans la page Tags pour créer des tags",
+        "messages": {
+            "loadError": "Échec du chargement des services",
+            "created": "Service créé avec succès",
+            "updated": "Service mis à jour avec succès",
+            "deleted": "Service supprimé avec succès",
+            "createError": "Échec de la création du service",
+            "updateError": "Échec de la mise à jour du service",
+            "deleteError": "Échec de la suppression du service"
+        }
     },
     "users": {
         "title": "Gestion des Utilisateurs",

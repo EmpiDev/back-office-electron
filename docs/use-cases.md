@@ -25,6 +25,8 @@ Un produit est un ensemble commercialisable composé de plusieurs services (bund
 - **Créer** un produit avec un nom, une description, un prix, et un type de paiement (ponctuel/mensuel).
 - **Composer** le produit en sélectionnant des services existants et en définissant leur quantité/volume.
 - **Associer** des Tags.
+- **Filtrer** la liste par Nom, Tags ou **Catégorie** (dérivée des services inclus).
+- **Trier** par Prix ou Nom.
 
 ## 5. Gestion de la Vitrine (Showcase) (`/showcase`)
 Configuration des éléments mis en avant sur le front-end client ou commercial.

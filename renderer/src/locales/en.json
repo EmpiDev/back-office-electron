@@ -40,7 +40,12 @@
         "search": "Search",
         "filterByTags": "Filter by tags",
         "sortByName": "Name",
-        "sortByPrice": "Price"
+        "sortByPrice": "Price",
+        "category": "Category",
+        "categories": "Categories",
+        "selectCategory": "Select a category",
+        "filterByCategories": "Filter by categories",
+        "noCategoriesAvailable": "No categories available"
     },
     "products": {
         "title": "Products Management",
@@ -60,7 +65,16 @@
         "addTopProduct": "Add to Top Products",
         "removeTopProduct": "Remove from Top Products",
         "addService": "Add Service",
-        "searchService": "Search for a service..."
+        "searchService": "Search for a service...",
+        "messages": {
+            "loadError": "Failed to load products",
+            "created": "Product created successfully",
+            "updated": "Product updated successfully",
+            "deleted": "Product deleted successfully",
+            "createError": "Failed to create product",
+            "updateError": "Failed to update product",
+            "deleteError": "Failed to delete product"
+        }
     },
     "services": {
         "title": "Services Management",
@@ -71,7 +85,16 @@
         "tagsLabel": "Tags",
         "tagsPlaceholder": "Select existing tags",
         "noTagsAvailable": "No tags available - create some in Tags page",
-        "goToTagsPage": "Go to Tags page to create tags"
+        "goToTagsPage": "Go to Tags page to create tags",
+        "messages": {
+            "loadError": "Failed to load services",
+            "created": "Service created successfully",
+            "updated": "Service updated successfully",
+            "deleted": "Service deleted successfully",
+            "createError": "Failed to create service",
+            "updateError": "Failed to update service",
+            "deleteError": "Failed to delete service"
+        }
     },
     "users": {
         "title": "Users Management",

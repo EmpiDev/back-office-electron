@@ -15,6 +15,9 @@ interface SearchFilterBarProps {
     selectedTags: Tag[];
     onTagsChange: (tags: Tag[]) => void;
     allTags: Tag[];
+    selectedCategories?: any[];
+    onCategoriesChange?: (categories: any[]) => void;
+    allCategories?: any[];
     placeholder?: string;
 }
 
@@ -24,9 +27,14 @@ const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
     selectedTags,
     onTagsChange,
     allTags,
+    selectedCategories,
+    onCategoriesChange,
+    allCategories,
     placeholder
 }) => {
     const { t } = useTranslation();
+
+    const showCategories = !!allCategories;
 
     return (
         <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
@@ -44,6 +52,26 @@ const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
                     ),
                 }}
             />
+            {showCategories && (
+                <Autocomplete
+                    multiple
+                    limitTags={1}
+                    options={allCategories || []}
+                    getOptionLabel={(option) => option.name}
+                    value={selectedCategories || []}
+                    onChange={(_, newValue) => onCategoriesChange && onCategoriesChange(newValue)}
+                    renderInput={(params) => (
+                        <TextField 
+                            {...params} 
+                            label={t('common.filterByCategories') || 'Filtrer par catégories'} 
+                            placeholder={(!selectedCategories || selectedCategories.length === 0) ? (t('common.categories') || 'Catégories') : ''}
+                            size="small"
+                        />
+                    )}
+                    sx={{ minWidth: '200px', flexGrow: 1 }}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                />
+            )}
             <Autocomplete
                 multiple
                 limitTags={2}

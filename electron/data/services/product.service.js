@@ -79,9 +79,11 @@ const removeServiceFromProduct = async (productId, serviceId) => {
 // Get Services associated with a Product
 const getServicesForProduct = async (productId) => {
     const sql = `
-        SELECT ps.service_id, ps.quantity, s.name, s.description
+        SELECT ps.service_id, ps.quantity, s.name, s.description,
+               s.category_id, c.name as category_name
         FROM product_services ps
         JOIN services s ON ps.service_id = s.id
+        LEFT JOIN categories c ON s.category_id = c.id
         WHERE ps.product_id = ?
     `;
     return await dbAll(sql, [productId]);

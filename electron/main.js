@@ -1,5 +1,6 @@
 // electron/main.js
-const { app, BrowserWindow, Menu, ipcMain, Notification } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
+// Force reload for backend changes
 const path = require("path");
 const { initDB } = require("./data/database");
 

@@ -17,6 +17,8 @@ export default function ServicesPage() {
     const [editingServiceId, setEditingServiceId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedFilterTags, setSelectedFilterTags] = useState<Tag[]>([]);
+    const [allCategories, setAllCategories] = useState<any[]>([]);
+    const [selectedFilterCategories, setSelectedFilterCategories] = useState<any[]>([]);
 
     useEffect(() => {
         loadData();
@@ -27,7 +29,7 @@ export default function ServicesPage() {
     const loadData = async () => {
         const response = await window.electronApi.getServices();
         if (!response.success) {
-             showNotification(response.error || 'Failed to load services', response.code);
+             showNotification(response.error || t('services.messages.loadError'), response.code);
              return;
         }
         const rawServices = response.data;
@@ -43,6 +45,11 @@ export default function ServicesPage() {
         const tagsResponse = await window.electronApi.getTags();
         if (tagsResponse.success) {
             setAllTags(tagsResponse.data);
+        }
+
+        const categoriesResponse = await window.electronApi.getCategories();
+        if (categoriesResponse.success) {
+            setAllCategories(categoriesResponse.data);
         }
     };
 
@@ -63,8 +70,6 @@ export default function ServicesPage() {
         
         // Tags are already in the service object now, but we use the API to be safe/consistent
         // or just use service.tags if we trust loadData is fresh
-        // Tags are already in the service object now, but we use the API to be safe/consistent
-        // or just use service.tags if we trust loadData is fresh
         const tagsRes = await window.electronApi.getTagsForService(service.id);
         const tags = tagsRes.success ? tagsRes.data : [];
         setSelectedTagsInForm(tags.map((t: any) => t.id));
@@ -78,11 +83,11 @@ export default function ServicesPage() {
         if (editingServiceId) {
             result = await window.electronApi.updateService(editingServiceId, newService);
             if (!result.success) {
-                 showNotification(result.error || 'Failed to update', result.code);
+                 showNotification(result.error || t('services.messages.updateError'), result.code);
                  return;
             }
             savedService = result.data;
-            showNotification('Service updated successfully', result.code);
+            showNotification(t('services.messages.updated'), result.code);
             
             // Update tag associations
             const currentTagsRes = await window.electronApi.getTagsForService(editingServiceId);
@@ -104,11 +109,11 @@ export default function ServicesPage() {
         } else {
             result = await window.electronApi.createService(newService);
             if (!result.success) {
-                showNotification(result.error || 'Failed to create', result.code);
+                showNotification(result.error || t('services.messages.createError'), result.code);
                 return;
             }
             savedService = result.data;
-            showNotification('Service created successfully', result.code);
+            showNotification(t('services.messages.created'), result.code);
             
             // Add tags to new service
             if (savedService && savedService.id) {
@@ -128,10 +133,10 @@ export default function ServicesPage() {
     const handleDeleteService = async (id: number) => {
         const res = await window.electronApi.deleteService(id);
         if (res.success) {
-            showNotification('Service deleted successfully', res.code);
+            showNotification(t('services.messages.deleted'), res.code);
             loadData();
         } else {
-            showNotification(res.error || 'Failed to delete', res.code);
+            showNotification(res.error || t('services.messages.deleteError'), res.code);
         }
     };
 
@@ -147,6 +152,14 @@ export default function ServicesPage() {
                 </Box>
             )
         },
+        { 
+            id: 'category_name', 
+            label: t('common.category') || 'Catégorie', 
+            sortable: true,
+            render: (row) => row.category_name ? (
+                <Chip label={row.category_name} size="small" variant="outlined" color="primary" />
+            ) : '-'
+        },
         { id: 'name', label: t('common.name'), sortable: true },
     ];
 
@@ -154,8 +167,10 @@ export default function ServicesPage() {
         const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesTags = selectedFilterTags.length === 0 || 
             selectedFilterTags.some(filterTag => service.tags && service.tags.some((t: any) => t.id === filterTag.id));
+        const matchesCategory = selectedFilterCategories.length === 0 ||
+            selectedFilterCategories.some(cat => service.category_id === cat.id);
         
-        return matchesSearch && matchesTags;
+        return matchesSearch && matchesTags && matchesCategory;
     });
 
     return (
@@ -177,7 +192,10 @@ export default function ServicesPage() {
                     onSearchChange={setSearchTerm}
                     selectedTags={selectedFilterTags}
                     onTagsChange={setSelectedFilterTags}
-                    allTags={allTags} 
+                    allTags={allTags}
+                    selectedCategories={selectedFilterCategories}
+                    onCategoriesChange={setSelectedFilterCategories}
+                    allCategories={allCategories}
                 />
             </Paper>
 
@@ -201,6 +219,23 @@ export default function ServicesPage() {
                                     value={newService.name} 
                                     onChange={e => setNewService({ ...newService, name: e.target.value })} 
                                     fullWidth 
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12 }}>
+                                <Autocomplete
+                                    options={allCategories}
+                                    getOptionLabel={(option) => option.name}
+                                    value={allCategories.find(c => c.id === newService.category_id) || null}
+                                    onChange={(_, newValue) => {
+                                        setNewService({ ...newService, category_id: newValue ? newValue.id : null });
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label={t('common.category') || 'Category'}
+                                            placeholder={t('common.selectCategory') || 'Select a category'}
+                                        />
+                                    )}
                                 />
                             </Grid>
                             <Grid size={{ xs: 12 }}>

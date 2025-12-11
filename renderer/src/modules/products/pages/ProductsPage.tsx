@@ -19,6 +19,8 @@ export default function ProductsPage() {
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedFilterTags, setSelectedFilterTags] = useState<Tag[]>([]);
+    const [allCategories, setAllCategories] = useState<any[]>([]);
+    const [selectedFilterCategories, setSelectedFilterCategories] = useState<any[]>([]);
 
     // Automatic tag inheritance from selected services
     useEffect(() => {
@@ -50,23 +52,49 @@ export default function ProductsPage() {
     const loadData = async () => {
         const productsRes = await window.electronApi.getProducts();
         if (!productsRes.success) {
-            showNotification(productsRes.error || 'Failed to load products', productsRes.code);
+            showNotification(productsRes.error || t('products.messages.loadError'), productsRes.code);
             return;
         }
         const rawProducts = productsRes.data;
         
-        // Fetch tags for each product
-        const productsWithTags = await Promise.all(rawProducts.map(async (product: any) => {
-            const tagsRes = await window.electronApi.getTagsForProduct(product.id);
-            return { ...product, tags: tagsRes.success ? tagsRes.data : [] };
+        // Fetch tags and services (for categories) for each product
+        const productsWithDetails = await Promise.all(rawProducts.map(async (product: any) => {
+            const [tagsRes, servicesRes] = await Promise.all([
+                window.electronApi.getTagsForProduct(product.id),
+                window.electronApi.getServicesForProduct(product.id)
+            ]);
+
+            const tags = tagsRes.success ? tagsRes.data : [];
+            const services = servicesRes.success ? servicesRes.data : [];
+            
+            // Extract unique categories from services
+            const productCategories = new Map();
+            services.forEach((s: any) => {
+                if (s.category_id && s.category_name) {
+                    productCategories.set(s.category_id, { id: s.category_id, name: s.category_name });
+                }
+            });
+            
+            const categories = Array.from(productCategories.values());
+
+            return { 
+                ...product, 
+                tags,
+                categories
+            };
         }));
 
-        setProducts(productsWithTags);
+        setProducts(productsWithDetails);
         const sRes = await window.electronApi.getServices(); // Fetch all services
         if (sRes.success) setAllServices(sRes.data);
         
         const tagsRes = await window.electronApi.getTags(); // Fetch all tags
         if (tagsRes.success) setAllTags(tagsRes.data);
+
+        const categoriesResponse = await window.electronApi.getCategories();
+        if (categoriesResponse.success) {
+            setAllCategories(categoriesResponse.data);
+        }
     };
 
     const handleOpenCreateDialog = () => {
@@ -109,7 +137,7 @@ export default function ProductsPage() {
         let res;
         if (editingProductId) {
              res = await window.electronApi.updateProduct(editingProductId, newProduct);
-             if (!res.success) { showNotification(res.error || 'Failed', res.code); return; }
+             if (!res.success) { showNotification(res.error || t('products.messages.updateError'), res.code); return; }
              savedProduct = res.data;
              
              const currentServicesRes = await window.electronApi.getServicesForProduct(editingProductId);
@@ -140,7 +168,7 @@ export default function ProductsPage() {
              }
         } else {
              res = await window.electronApi.createProduct(newProduct);
-             if (!res.success) { showNotification(res.error || 'Failed', res.code); return; }
+             if (!res.success) { showNotification(res.error || t('products.messages.createError'), res.code); return; }
              savedProduct = res.data;
         }
 
@@ -161,7 +189,7 @@ export default function ProductsPage() {
             }
         }
         
-        showNotification(editingProductId ? 'Product updated' : 'Product created', res.code);
+        showNotification(editingProductId ? t('products.messages.updated') : t('products.messages.created'), res.code);
 
         setNewProduct({ name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Reset form
         setSelectedServicesInForm([]); // Reset selected services
@@ -174,10 +202,10 @@ export default function ProductsPage() {
     const handleDeleteProduct = async (id: number) => {
         const res = await window.electronApi.deleteProduct(id);
         if (res.success) {
-            showNotification('Product deleted', res.code);
+            showNotification(t('products.messages.deleted'), res.code);
             loadData();
         } else {
-            showNotification(res.error || 'Failed to delete', res.code);
+            showNotification(res.error || t('products.messages.deleteError'), res.code);
         }
     };
 
@@ -190,7 +218,7 @@ export default function ProductsPage() {
         // The backend expects boolean for is_top_product, handled by updateProduct
         const res = await window.electronApi.updateProduct(product.id, updatedProduct);
         if (res.success) loadData();
-        else showNotification(res.error || 'Failed to update', res.code);
+        else showNotification(res.error || t('products.messages.updateError'), res.code);
     };
 
     const columns: Column<any>[] = [
@@ -225,6 +253,18 @@ export default function ProductsPage() {
         { id: 'price', label: t('common.price'), render: (row) => `${row.price} €`, sortable: true },
         { id: 'payment_type', label: t('common.paymentType'), format: (value) => value === 'monthly' ? t('products.paymentTypes.monthly') : t('products.paymentTypes.oneTime'), sortable: true },
         // { id: 'description', label: t('common.description') }, // Optional
+        {
+            id: 'categories',
+            label: t('common.categories') || 'Catégories',
+                sortable: true,
+            render: (row) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {row.categories && row.categories.map((cat: any) => (
+                        <Chip key={cat.id} label={cat.name} size="small" variant="outlined" color="primary" />
+                    ))}
+                </Box>
+            )
+        }
     ];
 
     const handleServiceSelection = (serviceId: number, isChecked: boolean) => {
@@ -245,8 +285,10 @@ export default function ProductsPage() {
         const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesTags = selectedFilterTags.length === 0 || 
             selectedFilterTags.some(filterTag => product.tags && product.tags.some((t: any) => t.id === filterTag.id));
+        const matchesCategories = selectedFilterCategories.length === 0 ||
+            selectedFilterCategories.some(filterCat => product.categories && product.categories.some((c: any) => c.id === filterCat.id));
         
-        return matchesSearch && matchesTags;
+        return matchesSearch && matchesTags && matchesCategories;
     });
 
     return (
@@ -270,7 +312,10 @@ export default function ProductsPage() {
                     onSearchChange={setSearchTerm}
                     selectedTags={selectedFilterTags}
                     onTagsChange={setSelectedFilterTags}
-                    allTags={allTags} 
+                    allTags={allTags}
+                    selectedCategories={selectedFilterCategories}
+                    onCategoriesChange={setSelectedFilterCategories}
+                    allCategories={allCategories}
                 />
             </Paper>
 
