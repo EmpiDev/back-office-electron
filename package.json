@@ -1,7 +1,7 @@
 {
-    "name": "mon-projet-electron-react",
+    "name": "cyna-back-office",
     "version": "0.1.0",
-    "description": "Mon application Electron React",
+    "description": "Cyna back office application",
     "private": true,
     "main": "electron/main.js",
     "scripts": {
@@ -26,7 +26,7 @@
     },
     "build": {
         "appId": "com.electron.react.app",
-        "productName": "Mon Projet Electron",
+        "productName": "Cyna back office",
         "directories": {
             "output": "dist"
         },

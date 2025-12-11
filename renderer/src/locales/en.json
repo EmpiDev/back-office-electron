@@ -3,6 +3,7 @@
         "title": "My Electron App",
         "nav": {
             "home": "Home",
+            "dashboard": "Dashboard",
             "products": "Products",
             "showcase": "Showcase",
             "services": "Services",

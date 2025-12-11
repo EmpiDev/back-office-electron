@@ -26,8 +26,6 @@ export default function ShowcasePage() {
     }, [loadData]);
 
     const carouselProducts = products.filter(p => p.is_in_carousel);
-    const topProducts = products.filter(p => p.is_top_product);
-    
     const otherProducts = products
         .filter(p => !p.is_in_carousel && !p.is_top_product)
         .filter(p => {
@@ -57,19 +55,6 @@ export default function ShowcasePage() {
                         limit={CAROUSEL_LIMIT}
                         emptyMessage="Aucun produit dans le carrousel."
                         switchColor="primary"
-                    />
-                </Grid>
-
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <ShowcaseSection 
-                        title={t('showcase.topProducts') || 'Top Produits'}
-                        icon={<StarIcon color="warning" />}
-                        products={topProducts}
-                        onToggle={toggleTopProduct}
-                        toggleProp="is_top_product"
-                        color="#fffbf0"
-                        emptyMessage="Aucun produit en Top Produit."
-                        switchColor="warning"
                     />
                 </Grid>
 

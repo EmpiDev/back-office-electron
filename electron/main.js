@@ -12,7 +12,7 @@ const tagService = require('./data/services/tag.service');
 const categoryService = require('./data/services/category.service');
 const dashboardService = require('./data/services/dashboard.service');
 
-const APP_NAME = "Mon app";
+const APP_NAME = "Cyna back office";
 
 const isDev = !app.isPackaged; // true en dev, false en prod
 

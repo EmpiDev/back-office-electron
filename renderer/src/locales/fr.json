@@ -3,6 +3,7 @@
         "title": "Mon App Electron",
         "nav": {
             "home": "Accueil",
+            "dashboard": "Tableau de bord",
             "products": "Produits",
             "showcase": "Mise en avant",
             "services": "Services",
@@ -59,8 +60,8 @@
             "oneTime": "En une fois",
             "monthly": "Par mois"
         },
-        "inheritedTags": "Tags (hérités des services sélectionnés)",
-        "noInheritedTags": "Aucun tag (sélectionnez des services pour voir les tags associés)",
+        "inheritedTags": "Tags",
+        "noInheritedTags": "Aucun tag",
         "topProduct": "Top Produit",
         "addTopProduct": "Ajouter aux Top Produits",
         "removeTopProduct": "Retirer des Top Produits",
