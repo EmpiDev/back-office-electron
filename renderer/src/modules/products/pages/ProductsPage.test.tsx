@@ -32,10 +32,10 @@ vi.mock('../../../contexts/NotificationContext', () => ({
 // Mock window.electronApi
 const mockGetProducts = vi.fn();
 const mockGetTagsForProduct = vi.fn();
+const mockGetServicesForProduct = vi.fn();
 const mockGetServices = vi.fn();
 const mockGetTags = vi.fn();
-
-
+const mockGetCategories = vi.fn();
 
 describe('ProductsPage', () => {
     beforeEach(() => {
@@ -43,8 +43,10 @@ describe('ProductsPage', () => {
         window.electronApi = {
             getProducts: mockGetProducts,
             getTagsForProduct: mockGetTagsForProduct,
+            getServicesForProduct: mockGetServicesForProduct,
             getServices: mockGetServices,
             getTags: mockGetTags,
+            getCategories: mockGetCategories,
         } as unknown as ElectronApi;
     });
 
@@ -56,8 +58,10 @@ describe('ProductsPage', () => {
         
         mockGetProducts.mockResolvedValue({ success: true, code: 200, data: products });
         mockGetTagsForProduct.mockResolvedValue({ success: true, code: 200, data: [] });
+        mockGetServicesForProduct.mockResolvedValue({ success: true, code: 200, data: [] });
         mockGetServices.mockResolvedValue({ success: true, code: 200, data: [] });
         mockGetTags.mockResolvedValue({ success: true, code: 200, data: [] });
+        mockGetCategories.mockResolvedValue({ success: true, code: 200, data: [] });
 
         render(<ProductsPage />);
 

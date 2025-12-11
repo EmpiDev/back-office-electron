@@ -10,8 +10,11 @@ import {
     TableContainer,
     TextField,
     Box,
-    TableSortLabel
+    TableSortLabel,
+    IconButton,
+    Tooltip
 } from '@mui/material';
+import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
@@ -125,23 +128,27 @@ export default function DataTable<T extends { id: number }>({ columns, data, onD
                             {(onDelete || onEdit) && (
                                 <TableCell align="right">
                                     {onEdit && (
-                                        <Button
-                                            size="small"
-                                            color="primary"
-                                            onClick={() => onEdit(row)}
-                                            sx={{ mr: 1 }}
-                                        >
-                                            {t('common.edit') || 'Modifier'}
-                                        </Button>
+                                        <Tooltip title={t('common.edit') || 'Modifier'}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => onEdit(row)}
+                                                color="primary"
+                                                sx={{ mr: 1 }}
+                                            >
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
                                     )}
                                     {onDelete && (
-                                        <Button 
-                                            size="small" 
-                                            color="error" 
-                                            onClick={() => onDelete(row.id)}
-                                        >
-                                            {t('common.delete')}
-                                        </Button>
+                                        <Tooltip title={t('common.delete') || 'Supprimer'}>
+                                            <IconButton 
+                                                size="small" 
+                                                onClick={() => onDelete(row.id)}
+                                                color="error"
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
                                     )}
                                 </TableCell>
                             )}
