@@ -4,7 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'react-i18next';
 
 interface Tag {
-    id: number;
+    id?: number;
     name: string;
     color?: string;
 }
