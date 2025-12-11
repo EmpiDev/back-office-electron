@@ -1,9 +1,18 @@
 const { dbRun, dbGet, dbAll } = require('../db-helper');
+const BusinessError = require('../../utils/BusinessError');
+
+// --- Helper for Validation ---
+const validateTag = (tag) => {
+    if (!tag.name || tag.name.trim() === '') {
+        throw new BusinessError('Le nom du tag est obligatoire.', 400);
+    }
+};
 
 // --- CRUD for Tags ---
 
 // Create Tag
 const createTag = async (tag) => {
+    validateTag(tag);
     const sql = `
         INSERT INTO tags (name)
         VALUES (?)
@@ -26,6 +35,7 @@ const getTagById = async (id) => {
 
 // Update Tag
 const updateTag = async (id, tag) => {
+    validateTag(tag);
     const sql = `
         UPDATE tags
         SET name = ?

@@ -59,7 +59,10 @@ export const useServices = () => {
 
         if (editingId) {
             result = await window.electronApi.updateService(editingId, serviceData);
-            if (!result.success) throw new Error(result.error);
+            if (!result.success) {
+                showNotification(result.error || 'Erreur inconnue', result.code);
+                throw new Error(result.error);
+            }
             savedService = result.data;
             
             const currentTagsRes = await window.electronApi.getTagsForService(editingId);
@@ -78,7 +81,10 @@ export const useServices = () => {
             }
         } else {
             result = await window.electronApi.createService(serviceData);
-            if (!result.success) throw new Error(result.error);
+            if (!result.success)  {
+                showNotification(result.error || 'Erreur inconnue', result.code);
+                throw new Error(result.error);
+            }
             savedService = result.data;
             
             if (savedService && savedService.id) {

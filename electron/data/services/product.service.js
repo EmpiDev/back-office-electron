@@ -1,9 +1,22 @@
 const { dbRun, dbGet, dbAll } = require('../db-helper');
+const BusinessError = require('../../utils/BusinessError');
+
+// --- Helper for Validation ---
+const validateProduct = (product) => {
+    if (!product.name || product.name.trim() === '') {
+        throw new BusinessError('Le nom du produit est obligatoire.', 400);
+    }
+    if (product.price < 0) {
+        throw new BusinessError('Le prix ne peut pas être négatif.', 400);
+    }
+};
 
 // --- CRUD for Products ---
 
 // Create Product
 const createProduct = async (product) => {
+    validateProduct(product);
+
     const sql = `
         INSERT INTO products (name, description, target_segment, is_in_carousel, is_top_product, price, payment_type)
         VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -34,6 +47,8 @@ const getProductById = async (id) => {
 
 // Update Product
 const updateProduct = async (id, product) => {
+    validateProduct(product);
+
     const sql = `
         UPDATE products
         SET name = ?, description = ?, target_segment = ?, is_in_carousel = ?, is_top_product = ?, price = ?, payment_type = ?, updated_at = CURRENT_TIMESTAMP

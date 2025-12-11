@@ -1,9 +1,18 @@
 const { dbRun, dbGet, dbAll } = require('../db-helper');
+const BusinessError = require('../../utils/BusinessError');
+
+// --- Helper for Validation ---
+const validateService = (service) => {
+    if (!service.name || service.name.trim() === '') {
+        throw new BusinessError('Le nom du service est obligatoire.', 400);
+    }
+};
 
 // --- CRUD ---
 
 // Create
 const createService = async (service) => {
+    validateService(service);
     const sql = `
         INSERT INTO services(name, description, category_id)
         VALUES(?, ?, ?)
@@ -35,6 +44,7 @@ const getServiceById = async (id) => {
 
 // Update
 const updateService = async (id, service) => {
+    validateService(service);
     const sql = `
         UPDATE services
         SET name = ?, description = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP

@@ -99,7 +99,10 @@ export const useProducts = () => {
 
         if (editingId) {
              res = await window.electronApi.updateProduct(editingId, productData);
-             if (!res.success) throw new Error(res.error);
+             if (!res.success) {
+                 showNotification(res.error || 'Erreur inconnue', res.code);
+                 throw new Error(res.error);
+             }
              savedProduct = res.data;
 
              // Manage Services
@@ -130,7 +133,10 @@ export const useProducts = () => {
              }
         } else {
              res = await window.electronApi.createProduct(productData);
-             if (!res.success) throw new Error(res.error);
+             if (!res.success) {
+                 showNotification(res.error || 'Erreur inconnue', res.code);
+                 throw new Error(res.error);
+             }
              savedProduct = res.data;
              
              if(savedProduct && savedProduct.id) {

@@ -1,9 +1,18 @@
 const { dbRun, dbGet, dbAll } = require('../db-helper');
+const BusinessError = require('../../utils/BusinessError');
+
+// --- Helper for Validation ---
+const validateUser = (user) => {
+    if (!user.username || user.username.trim() === '') {
+        throw new BusinessError("Le nom d'utilisateur est obligatoire.", 400);
+    }
+};
 
 // --- CRUD ---
 
 // Create
 const createUser = async (user) => {
+    validateUser(user);
     const sql = `
         INSERT INTO users (username, password_hash, role)
         VALUES (?, ?, ?)
@@ -33,6 +42,7 @@ const getUserByUsername = async (username) => {
 
 // Update
 const updateUser = async (id, user) => {
+    validateUser(user);
     const sql = `
         UPDATE users
         SET username = ?, role = ?, updated_at = CURRENT_TIMESTAMP
