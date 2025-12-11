@@ -4,7 +4,7 @@ import {
     InputLabel, Select, MenuItem, Typography, Autocomplete, Paper, IconButton, 
     Chip, DialogActions, Button 
 } from '@mui/material';
-import { Delete as DeleteIcon } from '@mui/icons-material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
 
 interface ProductFormDialogProps {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper, TextField, InputAdornment } from '@mui/material';
-import { Add as AddIcon, Search as SearchIcon } from '@mui/icons-material';
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'react-i18next';
 import DataTable, { Column } from '@/modules/shared/components/DataTable/DataTable';
 import { useTags } from '../hooks/useTags';

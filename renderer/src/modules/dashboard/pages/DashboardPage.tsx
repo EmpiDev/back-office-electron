@@ -1,5 +1,7 @@
 import { Grid, Typography, Box } from '@mui/material';
-import { Inventory, People, MonetizationOn } from '@mui/icons-material';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import PeopleIcon from '@mui/icons-material/People';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import { useTranslation } from 'react-i18next';
 import { useDashboardStats } from '../hooks/useDashboardStats';
 import StatCard from '../components/StatCard';
@@ -13,19 +15,19 @@ export default function DashboardPage() {
         { 
             title: t('dashboard.totalProducts') || 'Produits', 
             value: statsData.totalProducts, 
-            icon: <Inventory sx={{ fontSize: 40, color: 'primary.main' }} />, 
+            icon: <InventoryIcon fontSize="large" color="primary" />, 
             color: '#e3f2fd' 
         },
         { 
             title: t('dashboard.totalUsers') || 'Utilisateurs', 
             value: statsData.totalUsers, 
-            icon: <People sx={{ fontSize: 40, color: 'secondary.main' }} />, 
+            icon: <PeopleIcon fontSize="large" color="secondary" />, 
             color: '#fce4ec' 
         },
         { 
             title: t('dashboard.totalServices') || 'Services', 
             value: statsData.totalServices, 
-            icon: <MonetizationOn sx={{ fontSize: 40, color: 'success.main' }} />, 
+            icon: <MonetizationOnIcon fontSize="large" color="success" />, 
             color: '#e8f5e9' 
         },
     ];

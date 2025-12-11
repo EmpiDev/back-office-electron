@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper, Chip } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 import { Tag } from '../../../types/electron-api';
 import SearchFilterBar from '../../shared/components/SearchFilterBar';
