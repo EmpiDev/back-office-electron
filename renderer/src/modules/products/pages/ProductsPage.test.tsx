@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ProductsPage from './ProductsPage';
 import React from 'react';
 
-// Mock translation hook
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({
         t: (key: string) => {
@@ -15,6 +14,14 @@ vi.mock('react-i18next', () => ({
             };
             return translations[key] || key;
         },
+    }),
+}));
+
+// Mock Notification Context
+const mockShowNotification = vi.fn();
+vi.mock('../../../contexts/NotificationContext', () => ({
+    useNotification: () => ({
+        showNotification: mockShowNotification,
     }),
 }));
 
@@ -47,10 +54,10 @@ describe('ProductsPage', () => {
             { id: 2, name: 'Product B', price: 20, payment_type: 'monthly' },
         ];
         
-        mockGetProducts.mockResolvedValue(products);
-        mockGetTagsForProduct.mockResolvedValue([]);
-        mockGetServices.mockResolvedValue([]);
-        mockGetTags.mockResolvedValue([]);
+        mockGetProducts.mockResolvedValue({ success: true, code: 200, data: products });
+        mockGetTagsForProduct.mockResolvedValue({ success: true, code: 200, data: [] });
+        mockGetServices.mockResolvedValue({ success: true, code: 200, data: [] });
+        mockGetTags.mockResolvedValue({ success: true, code: 200, data: [] });
 
         render(<ProductsPage />);
 
