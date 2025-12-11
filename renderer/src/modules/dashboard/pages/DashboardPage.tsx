@@ -17,7 +17,6 @@ export default function DashboardPage() {
             try {
                 // @ts-ignore
                 const res = await window.electronApi.getDashboardStats();
-                console.log("Dashboard stats received:", res);
                 if (res.success && res.data) {
                     setStatsData(res.data);
                 } else {
@@ -34,7 +33,6 @@ export default function DashboardPage() {
         { title: t('dashboard.totalProducts') || 'Produits', value: statsData.totalProducts, icon: <Inventory sx={{ fontSize: 40, color: 'primary.main' }} />, color: '#e3f2fd' },
         { title: t('dashboard.totalUsers') || 'Utilisateurs', value: statsData.totalUsers, icon: <People sx={{ fontSize: 40, color: 'secondary.main' }} />, color: '#fce4ec' },
         { title: t('dashboard.totalServices') || 'Services', value: statsData.totalServices, icon: <MonetizationOn sx={{ fontSize: 40, color: 'success.main' }} />, color: '#e8f5e9' },
-        // { title: t('dashboard.growth') || 'Croissance', value: '+12%', icon: <TrendingUp sx={{ fontSize: 40, color: 'warning.main' }} />, color: '#fff3e0' },
     ];
 
     return (
@@ -110,16 +108,6 @@ export default function DashboardPage() {
                          </Box>
                     </Paper>
                 </Grid>
-                {/* 
-                <Grid size={{ xs: 12, md: 4 }}>
-                     <Paper sx={{ p: 3, borderRadius: 3, height: 400 }}>
-                         <Typography variant="h6" gutterBottom>Activités récentes</Typography>
-                         <Box sx={{ mt: 2 }}>
-                             
-                         </Box>
-                    </Paper>
-                </Grid>
-                */}
             </Grid>
         </Box>
     );
