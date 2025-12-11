@@ -39,7 +39,10 @@ graph TD
 ### 2. Processus de Rendu (React/Vite)
 - **Rôle** : Interface utilisateur interactive.
 - **Routing** : Utilise `react-router-dom` pour la navigation SPA (Single Page Application).
-- **Modules** : Organisation du code par fonctionnalité (`modules/products`, `modules/services`, etc.) plutôt que par type technique.
+- **Modules** : Organisation du code par fonctionnalité (`modules/products`, `modules/services`). Chaque module suit une séparation stricte :
+    - `pages/` : Vue principale (Container).
+    - `hooks/` : Logique métier et appels API (Custom Hooks).
+    - `components/` : Composants UI réutilisables ou spécifiques.
 - **Styles** : Utilisation de CSS standard ou modulaire.
 
 ### 3. IPC Bridge (Preload Script)
