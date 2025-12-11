@@ -1,70 +1,42 @@
-import { useEffect, useState } from 'react';
-import { useNotification } from '../../../contexts/NotificationContext';
-import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Button, Paper, TextField, InputAdornment } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import DataTable, { Column } from '@/modules/shared/components/DataTable/DataTable';
+import { useCategories } from '../hooks/useCategories';
+import CategoryFormDialog from '../components/CategoryFormDialog';
 
 export default function CategoriesPage() {
     const { t } = useTranslation();
-    const [categories, setCategories] = useState<any[]>([]);
+    const { 
+        categories, loading, 
+        loadData, deleteCategory, saveCategory 
+    } = useCategories();
+
     const [openDialog, setOpenDialog] = useState(false);
-    const [newCategory, setNewCategory] = useState({ name: '', description: '' });
-    const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
+    const [editingCategory, setEditingCategory] = useState<any | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         loadData();
-    }, []);
-
-
-    const { showNotification } = useNotification();
-
-    const loadData = async () => {
-        const res = await window.electronApi.getCategories();
-        if (res.success) setCategories(res.data);
-        else showNotification(res.error || 'Failed', res.code);
-    };
+    }, [loadData]);
 
     const handleOpenCreateDialog = () => {
-        setEditingCategoryId(null);
-        setNewCategory({ name: '', description: '' });
+        setEditingCategory(null);
         setOpenDialog(true);
     };
 
     const handleEditCategory = (category: any) => {
-        setEditingCategoryId(category.id);
-        setNewCategory({ name: category.name, description: category.description || '' });
+        setEditingCategory(category);
         setOpenDialog(true);
     };
 
-    const handleSaveCategory = async () => {
-        let res;
-        if (editingCategoryId) {
-            res = await window.electronApi.updateCategory(editingCategoryId, newCategory);
-        } else {
-            res = await window.electronApi.createCategory(newCategory);
-        }
-
-        if (res.success) {
-            showNotification(editingCategoryId ? 'Category updated' : 'Category created', res.code);
-        } else {
-            showNotification(res.error || 'Failed', res.code);
-            return;
-        }
-        setNewCategory({ name: '', description: '' });
-        setEditingCategoryId(null);
-        setOpenDialog(false);
-        loadData();
-    };
-
-    const handleDeleteCategory = async (id: number) => {
-        const res = await window.electronApi.deleteCategory(id);
-        if (res.success) {
-            showNotification('Category deleted', res.code);
-            loadData();
-        } else {
-            showNotification(res.error || 'Failed', res.code);
+    const handleSave = async (categoryData: any) => {
+        try {
+            await saveCategory(categoryData, editingCategory?.id || null);
+            setOpenDialog(false);
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -112,45 +84,17 @@ export default function CategoriesPage() {
                 <DataTable 
                     columns={columns}
                     data={filteredCategories}
-                    onDelete={handleDeleteCategory}
+                    onDelete={deleteCategory}
                     onEdit={handleEditCategory}
                 />
             </Paper>
 
-            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>{editingCategoryId ? (t('common.edit') || 'Modifier') : (t('categories.addCategory') || 'Ajouter une catégorie')}</DialogTitle>
-                <DialogContent>
-                    <Box sx={{ pt: 1 }}>
-                        <Grid container spacing={2}>
-                            <Grid size={{ xs: 12 }}>
-                                <TextField 
-                                    label={t('common.name') || 'Nom'} 
-                                    value={newCategory.name} 
-                                    onChange={e => setNewCategory({ ...newCategory, name: e.target.value })} 
-                                    fullWidth 
-                                    autoFocus
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12 }}>
-                                <TextField 
-                                    label={t('common.description') || 'Description'} 
-                                    value={newCategory.description} 
-                                    onChange={e => setNewCategory({ ...newCategory, description: e.target.value })} 
-                                    fullWidth 
-                                    multiline
-                                    rows={3}
-                                />
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setOpenDialog(false)}>{t('common.cancel') || 'Annuler'}</Button>
-                    <Button variant="contained" onClick={handleSaveCategory}>
-                        {editingCategoryId ? (t('common.save') || 'Enregistrer') : (t('common.add') || 'Ajouter')}
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <CategoryFormDialog 
+                open={openDialog} 
+                onClose={() => setOpenDialog(false)} 
+                onSave={handleSave}
+                initialData={editingCategory}
+            />
         </Box>
     );
 }

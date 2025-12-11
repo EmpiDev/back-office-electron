@@ -1,70 +1,42 @@
-import { useEffect, useState } from 'react';
-import { useNotification } from '../../../contexts/NotificationContext';
-import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Button, Paper, TextField, InputAdornment } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import DataTable, { Column } from '@/modules/shared/components/DataTable/DataTable';
+import { useTags } from '../hooks/useTags';
+import TagFormDialog from '../components/TagFormDialog';
 
 export default function TagsPage() {
     const { t } = useTranslation();
-    const [tags, setTags] = useState<any[]>([]);
+    const { 
+        tags, loading, 
+        loadData, deleteTag, saveTag 
+    } = useTags();
+
     const [openDialog, setOpenDialog] = useState(false);
-    const [newTag, setNewTag] = useState({ name: '' });
-    const [editingTagId, setEditingTagId] = useState<number | null>(null);
+    const [editingTag, setEditingTag] = useState<any | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         loadData();
-    }, []);
-
-
-    const { showNotification } = useNotification();
-
-    const loadData = async () => {
-        const res = await window.electronApi.getTags();
-        if (res.success) setTags(res.data);
-        else showNotification(res.error || 'Failed to load tags', res.code);
-    };
+    }, [loadData]);
 
     const handleOpenCreateDialog = () => {
-        setEditingTagId(null);
-        setNewTag({ name: '' });
+        setEditingTag(null);
         setOpenDialog(true);
     };
 
     const handleEditTag = (tag: any) => {
-        setEditingTagId(tag.id);
-        setNewTag({ name: tag.name });
+        setEditingTag(tag);
         setOpenDialog(true);
     };
 
-    const handleSaveTag = async () => {
-        let res;
-        if (editingTagId) {
-            res = await window.electronApi.updateTag(editingTagId, newTag);
-        } else {
-            res = await window.electronApi.createTag(newTag);
-        }
-
-        if (res.success) {
-            showNotification(editingTagId ? 'Tag updated' : 'Tag created', res.code);
-        } else {
-            showNotification(res.error || 'Failed to save tag', res.code);
-            return;
-        }
-        setNewTag({ name: '' });
-        setEditingTagId(null);
-        setOpenDialog(false);
-        loadData();
-    };
-
-    const handleDeleteTag = async (id: number) => {
-        const res = await window.electronApi.deleteTag(id);
-        if (res.success) {
-            showNotification('Tag deleted', res.code);
-            loadData();
-        } else {
-            showNotification(res.error || 'Failed to delete tag', res.code);
+    const handleSave = async (tagData: any) => {
+        try {
+            await saveTag(tagData, editingTag?.id || null);
+            setOpenDialog(false);
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -111,35 +83,17 @@ export default function TagsPage() {
                 <DataTable 
                     columns={columns}
                     data={filteredTags}
-                    onDelete={handleDeleteTag}
+                    onDelete={deleteTag}
                     onEdit={handleEditTag}
                 />
             </Paper>
 
-            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>{editingTagId ? t('tags.editTag') : t('tags.addTag')}</DialogTitle>
-                <DialogContent>
-                    <Box sx={{ pt: 1 }}>
-                        <Grid container spacing={2}>
-                            <Grid size={{ xs: 12 }}>
-                                <TextField 
-                                    label={t('tags.nameLabel')} 
-                                    value={newTag.name} 
-                                    onChange={e => setNewTag({ ...newTag, name: e.target.value })} 
-                                    fullWidth 
-                                    autoFocus
-                                />
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setOpenDialog(false)}>{t('common.cancel')}</Button>
-                    <Button variant="contained" onClick={handleSaveTag}>
-                        {editingTagId ? t('common.save') : t('tags.add')}
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <TagFormDialog 
+                open={openDialog} 
+                onClose={() => setOpenDialog(false)} 
+                onSave={handleSave}
+                initialData={editingTag}
+            />
         </Box>
     );
 }
