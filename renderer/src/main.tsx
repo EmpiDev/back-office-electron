@@ -7,6 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import theme from './theme'
 import { HashRouter } from 'react-router-dom'
 import './i18n'
+import { NotificationProvider } from './contexts/NotificationContext'
 
 const container = document.getElementById('root')
 
@@ -19,7 +20,9 @@ createRoot(container).render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <HashRouter>
-        <App />
+        <NotificationProvider>
+          <App />
+        </NotificationProvider>
       </HashRouter>
     </ThemeProvider>
   </StrictMode>,

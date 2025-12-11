@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNotification } from '../../../contexts/NotificationContext';
 import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -16,9 +17,13 @@ export default function CategoriesPage() {
         loadData();
     }, []);
 
+
+    const { showNotification } = useNotification();
+
     const loadData = async () => {
-        const c = await window.electronApi.getCategories();
-        setCategories(c);
+        const res = await window.electronApi.getCategories();
+        if (res.success) setCategories(res.data);
+        else showNotification(res.error || 'Failed', res.code);
     };
 
     const handleOpenCreateDialog = () => {
@@ -34,10 +39,18 @@ export default function CategoriesPage() {
     };
 
     const handleSaveCategory = async () => {
+        let res;
         if (editingCategoryId) {
-            await window.electronApi.updateCategory(editingCategoryId, newCategory);
+            res = await window.electronApi.updateCategory(editingCategoryId, newCategory);
         } else {
-            await window.electronApi.createCategory(newCategory);
+            res = await window.electronApi.createCategory(newCategory);
+        }
+
+        if (res.success) {
+            showNotification(editingCategoryId ? 'Category updated' : 'Category created', res.code);
+        } else {
+            showNotification(res.error || 'Failed', res.code);
+            return;
         }
         setNewCategory({ name: '', description: '' });
         setEditingCategoryId(null);
@@ -46,8 +59,13 @@ export default function CategoriesPage() {
     };
 
     const handleDeleteCategory = async (id: number) => {
-        await window.electronApi.deleteCategory(id);
-        loadData();
+        const res = await window.electronApi.deleteCategory(id);
+        if (res.success) {
+            showNotification('Category deleted', res.code);
+            loadData();
+        } else {
+            showNotification(res.error || 'Failed', res.code);
+        }
     };
 
     const columns: Column<any>[] = [

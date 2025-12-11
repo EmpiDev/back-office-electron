@@ -1,4 +1,3 @@
-import type { Joke } from './jokes'
 
 export interface User {
   id?: number;
@@ -49,59 +48,66 @@ export interface Category {
 }
 
 declare global {
-  interface ElectronApi {
-    ping: () => Promise<unknown>
-    openFileDialog: () => Promise<string[] | undefined>
-    notifyJokeAdded: (joke: Joke) => Promise<void> | void
 
-    // Users
-    getUsers: () => Promise<User[]>;
-    createUser: (user: User) => Promise<User>;
-    updateUser: (id: number, user: User) => Promise<User>;
-    deleteUser(id: number): unknown;
+    export interface ApiResponse<T> {
+      success: boolean;
+      code: number;
+      data: T;
+      error?: string;
+    }
+  
+    interface ElectronApi {
+      // Users
+      getUsers: () => Promise<ApiResponse<User[]>>;
+      createUser: (user: User) => Promise<ApiResponse<User>>;
+      updateUser: (id: number, user: User) => Promise<ApiResponse<User>>;
+      deleteUser(id: number): Promise<ApiResponse<void>>;
+  
+      // Services
+      getServices: () => Promise<ApiResponse<Service[]>>;
+      createService: (service: Service) => Promise<ApiResponse<Service>>;
+      updateService: (id: number, service: Service) => Promise<ApiResponse<Service>>;
+      deleteService: (id: number) => Promise<ApiResponse<void>>;
+  
+  
+      // Products
+      getProducts: () => Promise<ApiResponse<Product[]>>;
+      createProduct: (product: Product) => Promise<ApiResponse<Product>>;
+      updateProduct: (id: number, product: Product) => Promise<ApiResponse<Product>>;
+      deleteProduct: (id: number) => Promise<ApiResponse<void>>;
+      
+      // Product Services Management
+      addServiceToProduct: (productId: number, serviceId: number, quantity: number) => Promise<ApiResponse<any>>;
+      removeServiceFromProduct: (productId: number, serviceId: number) => Promise<ApiResponse<void>>;
+      getServicesForProduct: (productId: number) => Promise<ApiResponse<any[]>>;
+  
+  
+  
+      // Tags
+      getTags: () => Promise<ApiResponse<Tag[]>>;
+      createTag: (tag: Tag) => Promise<ApiResponse<Tag>>;
+      updateTag: (id: number, tag: Tag) => Promise<ApiResponse<Tag>>;
+      deleteTag: (id: number) => Promise<ApiResponse<void>>;
+      
+      // Tag-Service relationships
+      getTagsForService: (serviceId: number) => Promise<ApiResponse<Tag[]>>;
+      addTagToService: (serviceId: number, tagId: number) => Promise<ApiResponse<any>>;
+      removeTagFromService: (serviceId: number, tagId: number) => Promise<ApiResponse<void>>;
+      
+      // Tag-Product relationships
+      getTagsForProduct: (productId: number) => Promise<ApiResponse<Tag[]>>;
+      addTagToProduct: (productId: number, tagId: number) => Promise<ApiResponse<any>>;
+      removeTagFromProduct: (productId: number, tagId: number) => Promise<ApiResponse<void>>;
+  
+      // Categories
+      getCategories: () => Promise<ApiResponse<Category[]>>;
+      createCategory: (category: Category) => Promise<ApiResponse<Category>>;
+      updateCategory: (id: number, category: Category) => Promise<ApiResponse<Category>>;
+      deleteCategory: (id: number) => Promise<ApiResponse<void>>;
 
-    // Services
-    getServices: () => Promise<Service[]>;
-    createService: (service: Service) => Promise<Service>;
-    updateService: (id: number, service: Service) => Promise<Service>;
-    deleteService: (id: number) => Promise<void>;
-
-
-    // Products
-    getProducts: () => Promise<Product[]>;
-    createProduct: (product: Product) => Promise<Product>;
-    updateProduct: (id: number, product: Product) => Promise<Product>;
-    deleteProduct: (id: number) => Promise<void>;
-    
-    // Product Services Management
-    addServiceToProduct: (productId: number, serviceId: number, quantity: number) => Promise<any>;
-    removeServiceFromProduct: (productId: number, serviceId: number) => Promise<void>;
-    getServicesForProduct: (productId: number) => Promise<any[]>;
-
-
-
-    // Tags
-    getTags: () => Promise<Tag[]>;
-    createTag: (tag: Tag) => Promise<Tag>;
-    updateTag: (id: number, tag: Tag) => Promise<Tag>;
-    deleteTag: (id: number) => Promise<void>;
-    
-    // Tag-Service relationships
-    getTagsForService: (serviceId: number) => Promise<Tag[]>;
-    addTagToService: (serviceId: number, tagId: number) => Promise<any>;
-    removeTagFromService: (serviceId: number, tagId: number) => Promise<void>;
-    
-    // Tag-Product relationships
-    getTagsForProduct: (productId: number) => Promise<Tag[]>;
-    addTagToProduct: (productId: number, tagId: number) => Promise<any>;
-    removeTagFromProduct: (productId: number, tagId: number) => Promise<void>;
-
-    // Categories
-    getCategories: () => Promise<Category[]>;
-    createCategory: (category: Category) => Promise<Category>;
-    updateCategory: (id: number, category: Category) => Promise<Category>;
-    deleteCategory: (id: number) => Promise<void>;
-  }
+        // Dashboard
+      getDashboardStats: () => Promise<ApiResponse<any>>;
+    }
 
   interface Window {
     electronApi: ElectronApi

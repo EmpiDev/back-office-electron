@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNotification } from '../../../contexts/NotificationContext';
 import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, FormGroup, FormControlLabel, Chip, IconButton, Tooltip, Autocomplete } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon, CloudDownload as DownloadIcon, Star as StarIcon, StarBorder as StarBorderIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -24,8 +25,10 @@ export default function ProductsPage() {
         const fetchServiceTags = async () => {
             const allServiceTags = new Set<number>();
             for (const { serviceId } of selectedServicesInForm) {
-                const tags = await window.electronApi.getTagsForService(serviceId);
-                tags.forEach(tag => tag.id && allServiceTags.add(tag.id));
+                const tagsRes = await window.electronApi.getTagsForService(serviceId);
+                if (tagsRes.success) {
+                    tagsRes.data.forEach(tag => tag.id && allServiceTags.add(tag.id));
+                }
             }
             setSelectedTagsInForm(Array.from(allServiceTags));
         };
@@ -41,20 +44,29 @@ export default function ProductsPage() {
         loadData();
     }, []);
 
+
+    const { showNotification } = useNotification();
+
     const loadData = async () => {
-        const rawProducts = await window.electronApi.getProducts();
+        const productsRes = await window.electronApi.getProducts();
+        if (!productsRes.success) {
+            showNotification(productsRes.error || 'Failed to load products', productsRes.code);
+            return;
+        }
+        const rawProducts = productsRes.data;
         
         // Fetch tags for each product
         const productsWithTags = await Promise.all(rawProducts.map(async (product: any) => {
-            const tags = await window.electronApi.getTagsForProduct(product.id);
-            return { ...product, tags };
+            const tagsRes = await window.electronApi.getTagsForProduct(product.id);
+            return { ...product, tags: tagsRes.success ? tagsRes.data : [] };
         }));
 
         setProducts(productsWithTags);
-        const s = await window.electronApi.getServices(); // Fetch all services
-        setAllServices(s);
-        const tags = await window.electronApi.getTags(); // Fetch all tags
-        setAllTags(tags);
+        const sRes = await window.electronApi.getServices(); // Fetch all services
+        if (sRes.success) setAllServices(sRes.data);
+        
+        const tagsRes = await window.electronApi.getTags(); // Fetch all tags
+        if (tagsRes.success) setAllTags(tagsRes.data);
     };
 
     const handleOpenCreateDialog = () => {
@@ -78,22 +90,31 @@ export default function ProductsPage() {
         });
         
         // Load associated services
-        const services = await window.electronApi.getServicesForProduct(product.id);
-        setSelectedServicesInForm(services.map(s => ({ serviceId: s.service_id, quantity: s.quantity })));
+        const servicesRes = await window.electronApi.getServicesForProduct(product.id);
+        if (servicesRes.success) {
+            setSelectedServicesInForm(servicesRes.data.map((s: any) => ({ serviceId: s.service_id, quantity: s.quantity })));
+        }
         
         // Load associated tags
-        const tags = await window.electronApi.getTagsForProduct(product.id);
-        setSelectedTagsInForm(tags.map((t: any) => t.id));
+        const tagsRes = await window.electronApi.getTagsForProduct(product.id);
+        if (tagsRes.success) {
+            setSelectedTagsInForm(tagsRes.data.map((t: any) => t.id));
+        }
         
         setOpenDialog(true);
     };
 
     const handleSaveProduct = async () => {
         let savedProduct;
+        let res;
         if (editingProductId) {
-             savedProduct = await window.electronApi.updateProduct(editingProductId, newProduct);
+             res = await window.electronApi.updateProduct(editingProductId, newProduct);
+             if (!res.success) { showNotification(res.error || 'Failed', res.code); return; }
+             savedProduct = res.data;
              
-             const currentServices = await window.electronApi.getServicesForProduct(editingProductId);
+             const currentServicesRes = await window.electronApi.getServicesForProduct(editingProductId);
+             const currentServices = currentServicesRes.success ? currentServicesRes.data : [];
+
              for(const s of currentServices) {
                  if(!selectedServicesInForm.find(newS => newS.serviceId === s.service_id)) {
                      await window.electronApi.removeServiceFromProduct(editingProductId, s.service_id);
@@ -101,7 +122,8 @@ export default function ProductsPage() {
              }
              
              // Update tag associations
-             const currentTags = await window.electronApi.getTagsForProduct(editingProductId);
+             const currentTagsRes = await window.electronApi.getTagsForProduct(editingProductId);
+             const currentTags = currentTagsRes.success ? currentTagsRes.data : [];
              
              // Remove tags that are no longer selected
              for (const tag of currentTags) {
@@ -117,23 +139,30 @@ export default function ProductsPage() {
                  }
              }
         } else {
-             savedProduct = await window.electronApi.createProduct(newProduct);
+             res = await window.electronApi.createProduct(newProduct);
+             if (!res.success) { showNotification(res.error || 'Failed', res.code); return; }
+             savedProduct = res.data;
         }
 
         const productId = savedProduct ? savedProduct.id : editingProductId;
 
         // Link selected services to the product
         for (const selectedService of selectedServicesInForm) {
+            // Check if already linked if editing? 
+            // The logic above removes only deleted ones. For existing ones, addServiceToProduct might duplicate or update?
+            // Assuming addServiceToProduct handles update or ignore.
             await window.electronApi.addServiceToProduct(productId!, selectedService.serviceId, selectedService.quantity);
         }
         
         // Add tags to new product
-        if (savedProduct && savedProduct.id) {
+        if (savedProduct && savedProduct.id && !editingProductId) {
             for (const tagId of selectedTagsInForm) {
                 await window.electronApi.addTagToProduct(savedProduct.id, tagId);
             }
         }
         
+        showNotification(editingProductId ? 'Product updated' : 'Product created', res.code);
+
         setNewProduct({ name: '', description: '', target_segment: '', is_in_carousel: false, is_top_product: false, price: 0, payment_type: 'one_time' }); // Reset form
         setSelectedServicesInForm([]); // Reset selected services
         setSelectedTagsInForm([]); // Reset selected tags
@@ -143,8 +172,13 @@ export default function ProductsPage() {
     };
 
     const handleDeleteProduct = async (id: number) => {
-        await window.electronApi.deleteProduct(id);
-        loadData();
+        const res = await window.electronApi.deleteProduct(id);
+        if (res.success) {
+            showNotification('Product deleted', res.code);
+            loadData();
+        } else {
+            showNotification(res.error || 'Failed to delete', res.code);
+        }
     };
 
     const handleToggleTopProduct = async (product: any) => {
@@ -154,8 +188,9 @@ export default function ProductsPage() {
             // Ensure boolean fields are properly typed/converted if necessary, though direct spread works for known structure
         };
         // The backend expects boolean for is_top_product, handled by updateProduct
-        await window.electronApi.updateProduct(product.id, updatedProduct);
-        loadData();
+        const res = await window.electronApi.updateProduct(product.id, updatedProduct);
+        if (res.success) loadData();
+        else showNotification(res.error || 'Failed to update', res.code);
     };
 
     const columns: Column<any>[] = [

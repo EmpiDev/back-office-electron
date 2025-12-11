@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNotification } from '../../../contexts/NotificationContext';
 import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, Autocomplete, Chip } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -21,18 +22,28 @@ export default function ServicesPage() {
         loadData();
     }, []);
 
+    const { showNotification } = useNotification();
+
     const loadData = async () => {
-        const rawServices = await window.electronApi.getServices();
+        const response = await window.electronApi.getServices();
+        if (!response.success) {
+             showNotification(response.error || 'Failed to load services', response.code);
+             return;
+        }
+        const rawServices = response.data;
         
         // Fetch tags for each service
         const servicesWithTags = await Promise.all(rawServices.map(async (service: any) => {
-            const tags = await window.electronApi.getTagsForService(service.id);
+            const tagsRes = await window.electronApi.getTagsForService(service.id);
+            const tags = tagsRes.success ? tagsRes.data : [];
             return { ...service, tags };
         }));
 
         setServices(servicesWithTags);
-        const tags = await window.electronApi.getTags();
-        setAllTags(tags);
+        const tagsResponse = await window.electronApi.getTags();
+        if (tagsResponse.success) {
+            setAllTags(tagsResponse.data);
+        }
     };
 
     const handleOpenCreateDialog = () => {
@@ -52,7 +63,10 @@ export default function ServicesPage() {
         
         // Tags are already in the service object now, but we use the API to be safe/consistent
         // or just use service.tags if we trust loadData is fresh
-        const tags = await window.electronApi.getTagsForService(service.id);
+        // Tags are already in the service object now, but we use the API to be safe/consistent
+        // or just use service.tags if we trust loadData is fresh
+        const tagsRes = await window.electronApi.getTagsForService(service.id);
+        const tags = tagsRes.success ? tagsRes.data : [];
         setSelectedTagsInForm(tags.map((t: any) => t.id));
         
         setOpenDialog(true);
@@ -60,11 +74,19 @@ export default function ServicesPage() {
 
     const handleSaveService = async () => {
         let savedService;
+        let result;
         if (editingServiceId) {
-            savedService = await window.electronApi.updateService(editingServiceId, newService);
+            result = await window.electronApi.updateService(editingServiceId, newService);
+            if (!result.success) {
+                 showNotification(result.error || 'Failed to update', result.code);
+                 return;
+            }
+            savedService = result.data;
+            showNotification('Service updated successfully', result.code);
             
             // Update tag associations
-            const currentTags = await window.electronApi.getTagsForService(editingServiceId);
+            const currentTagsRes = await window.electronApi.getTagsForService(editingServiceId);
+            const currentTags = currentTagsRes.success ? currentTagsRes.data : [];
             
             // Remove tags that are no longer selected
             for (const tag of currentTags) {
@@ -80,7 +102,13 @@ export default function ServicesPage() {
                 }
             }
         } else {
-            savedService = await window.electronApi.createService(newService);
+            result = await window.electronApi.createService(newService);
+            if (!result.success) {
+                showNotification(result.error || 'Failed to create', result.code);
+                return;
+            }
+            savedService = result.data;
+            showNotification('Service created successfully', result.code);
             
             // Add tags to new service
             if (savedService && savedService.id) {
@@ -98,8 +126,13 @@ export default function ServicesPage() {
     };
 
     const handleDeleteService = async (id: number) => {
-        await window.electronApi.deleteService(id);
-        loadData();
+        const res = await window.electronApi.deleteService(id);
+        if (res.success) {
+            showNotification('Service deleted successfully', res.code);
+            loadData();
+        } else {
+            showNotification(res.error || 'Failed to delete', res.code);
+        }
     };
 
     const columns: Column<any>[] = [

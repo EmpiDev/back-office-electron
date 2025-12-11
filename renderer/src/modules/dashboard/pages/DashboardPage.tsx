@@ -16,10 +16,12 @@ export default function DashboardPage() {
         const loadStats = async () => {
             try {
                 // @ts-ignore
-                const data = await window.electronApi.getDashboardStats();
-                console.log("Dashboard stats received:", data);
-                if (data) {
-                    setStatsData(data);
+                const res = await window.electronApi.getDashboardStats();
+                console.log("Dashboard stats received:", res);
+                if (res.success && res.data) {
+                    setStatsData(res.data);
+                } else {
+                    console.error("Dashboard error:", res.error);
                 }
             } catch (error) {
                 console.error("Failed to load dashboard stats:", error);

@@ -36,127 +36,69 @@ function createWindow() {
     }
 }
 
-ipcMain.handle('jokes:notify-added', (_event, joke) => {
-    if (Notification.isSupported()) {
-        new Notification({
-            title: 'Nouvelle blague ajoutée',
-            body: joke?.question || 'Une nouvelle blague a été ajoutée.',
-        }).show();
+// Helper for standardized API responses
+const handleRequest = async (operation) => {
+    try {
+        const data = await operation();
+        return { success: true, code: 200, data };
+    } catch (error) {
+        console.error("IPC Error:", error);
+        const code = error.code || error.status || 500;
+        return { success: false, code: typeof code === 'number' ? code : 500, error: error.message };
     }
-});
+};
+
+
 
 // --- IPC Handlers for Data Services ---
 
 // Users
-ipcMain.handle('users:get-all', async () => {
-    return await userService.getAllUsers();
-});
-ipcMain.handle('users:create', async (_event, user) => {
-    return await userService.createUser(user);
-});
-ipcMain.handle('users:delete', async (_event, user) => {
-    return await userService.deleteUser(user);
-});
-ipcMain.handle('users:update', async (_event, id, user) => {
-    return await userService.updateUser(id, user);
-});
+ipcMain.handle('users:get-all', async () => handleRequest(() => userService.getAllUsers()));
+ipcMain.handle('users:create', async (_event, user) => handleRequest(() => userService.createUser(user)));
+ipcMain.handle('users:delete', async (_event, user) => handleRequest(() => userService.deleteUser(user)));
+ipcMain.handle('users:update', async (_event, id, user) => handleRequest(() => userService.updateUser(id, user)));
 
 // Services
-ipcMain.handle('services:get-all', async () => {
-    return await serviceService.getAllServices();
-});
-ipcMain.handle('services:create', async (_event, service) => {
-    return await serviceService.createService(service);
-});
-ipcMain.handle('services:update', async (_event, id, service) => {
-    return await serviceService.updateService(id, service);
-});
-ipcMain.handle('services:delete', async (_event, id) => {
-    return await serviceService.deleteService(id);
-});
+ipcMain.handle('services:get-all', async () => handleRequest(() => serviceService.getAllServices()));
+ipcMain.handle('services:create', async (_event, service) => handleRequest(() => serviceService.createService(service)));
+ipcMain.handle('services:update', async (_event, id, service) => handleRequest(() => serviceService.updateService(id, service)));
+ipcMain.handle('services:delete', async (_event, id) => handleRequest(() => serviceService.deleteService(id)));
 
 // Products
-ipcMain.handle('products:get-all', async () => {
-    return await productService.getAllProducts();
-});
-ipcMain.handle('products:create', async (_event, product) => {
-    return await productService.createProduct(product);
-});
-ipcMain.handle('products:update', async (_event, id, product) => {
-    return await productService.updateProduct(id, product);
-});
-ipcMain.handle('products:delete', async (_event, id) => {
-    return await productService.deleteProduct(id);
-});
+ipcMain.handle('products:get-all', async () => handleRequest(() => productService.getAllProducts()));
+ipcMain.handle('products:create', async (_event, product) => handleRequest(() => productService.createProduct(product)));
+ipcMain.handle('products:update', async (_event, id, product) => handleRequest(() => productService.updateProduct(id, product)));
+ipcMain.handle('products:delete', async (_event, id) => handleRequest(() => productService.deleteProduct(id)));
 
-// Handlers for Product-Service relationships
-ipcMain.handle('products:add-service', async (_event, productId, serviceId, quantity) => {
-    return await productService.addServiceToProduct(productId, serviceId, quantity);
-});
-ipcMain.handle('products:remove-service', async (_event, productId, serviceId) => {
-    return await productService.removeServiceFromProduct(productId, serviceId);
-});
-ipcMain.handle('products:get-services-for-product', async (_event, productId) => {
-    return await productService.getServicesForProduct(productId);
-});
-
-
+// Product Services
+ipcMain.handle('products:add-service', async (_event, productId, serviceId, quantity) => handleRequest(() => productService.addServiceToProduct(productId, serviceId, quantity)));
+ipcMain.handle('products:remove-service', async (_event, productId, serviceId) => handleRequest(() => productService.removeServiceFromProduct(productId, serviceId)));
+ipcMain.handle('products:get-services-for-product', async (_event, productId) => handleRequest(() => productService.getServicesForProduct(productId)));
 
 // Tags
-ipcMain.handle('tags:get-all', async () => {
-    return await tagService.getAllTags();
-});
-ipcMain.handle('tags:create', async (_event, tag) => {
-    return await tagService.createTag(tag);
-});
-ipcMain.handle('tags:update', async (_event, id, tag) => {
-    return await tagService.updateTag(id, tag);
-});
-ipcMain.handle('tags:delete', async (_event, id) => {
-    return await tagService.deleteTag(id);
-});
+ipcMain.handle('tags:get-all', async () => handleRequest(() => tagService.getAllTags()));
+ipcMain.handle('tags:create', async (_event, tag) => handleRequest(() => tagService.createTag(tag)));
+ipcMain.handle('tags:update', async (_event, id, tag) => handleRequest(() => tagService.updateTag(id, tag)));
+ipcMain.handle('tags:delete', async (_event, id) => handleRequest(() => tagService.deleteTag(id)));
 
 // Tag-Service relationships
-ipcMain.handle('tags:get-for-service', async (_event, serviceId) => {
-    return await tagService.getTagsForService(serviceId);
-});
-ipcMain.handle('tags:add-to-service', async (_event, serviceId, tagId) => {
-    return await tagService.addTagToService(serviceId, tagId);
-});
-ipcMain.handle('tags:remove-from-service', async (_event, serviceId, tagId) => {
-    return await tagService.removeTagFromService(serviceId, tagId);
-});
+ipcMain.handle('tags:get-for-service', async (_event, serviceId) => handleRequest(() => tagService.getTagsForService(serviceId)));
+ipcMain.handle('tags:add-to-service', async (_event, serviceId, tagId) => handleRequest(() => tagService.addTagToService(serviceId, tagId)));
+ipcMain.handle('tags:remove-from-service', async (_event, serviceId, tagId) => handleRequest(() => tagService.removeTagFromService(serviceId, tagId)));
 
 // Tag-Product relationships
-ipcMain.handle('tags:get-for-product', async (_event, productId) => {
-    return await tagService.getTagsForProduct(productId);
-});
-ipcMain.handle('tags:add-to-product', async (_event, productId, tagId) => {
-    return await tagService.addTagToProduct(productId, tagId);
-});
-ipcMain.handle('tags:remove-from-product', async (_event, productId, tagId) => {
-    return await tagService.removeTagFromProduct(productId, tagId);
-});
+ipcMain.handle('tags:get-for-product', async (_event, productId) => handleRequest(() => tagService.getTagsForProduct(productId)));
+ipcMain.handle('tags:add-to-product', async (_event, productId, tagId) => handleRequest(() => tagService.addTagToProduct(productId, tagId)));
+ipcMain.handle('tags:remove-from-product', async (_event, productId, tagId) => handleRequest(() => tagService.removeTagFromProduct(productId, tagId)));
 
 // Categories
-ipcMain.handle('categories:get-all', async () => {
-    return await categoryService.getAllCategories();
-});
-ipcMain.handle('categories:create', async (_event, category) => {
-    return await categoryService.createCategory(category);
-});
-ipcMain.handle('categories:update', async (_event, id, category) => {
-    return await categoryService.updateCategory(id, category);
-});
-ipcMain.handle('categories:delete', async (_event, id) => {
-    return await categoryService.deleteCategory(id);
-});
+ipcMain.handle('categories:get-all', async () => handleRequest(() => categoryService.getAllCategories()));
+ipcMain.handle('categories:create', async (_event, category) => handleRequest(() => categoryService.createCategory(category)));
+ipcMain.handle('categories:update', async (_event, id, category) => handleRequest(() => categoryService.updateCategory(id, category)));
+ipcMain.handle('categories:delete', async (_event, id) => handleRequest(() => categoryService.deleteCategory(id)));
 
 // Dashboard
-ipcMain.handle('dashboard:get-stats', async () => {
-    return await dashboardService.getDashboardStats();
-});
-
+ipcMain.handle('dashboard:get-stats', async () => handleRequest(() => dashboardService.getDashboardStats()));
 
 app.whenReady().then(() => {
     app.setName(APP_NAME);

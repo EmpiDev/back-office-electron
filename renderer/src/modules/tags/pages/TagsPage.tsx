@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNotification } from '../../../contexts/NotificationContext';
 import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -16,9 +17,13 @@ export default function TagsPage() {
         loadData();
     }, []);
 
+
+    const { showNotification } = useNotification();
+
     const loadData = async () => {
-        const t = await window.electronApi.getTags();
-        setTags(t);
+        const res = await window.electronApi.getTags();
+        if (res.success) setTags(res.data);
+        else showNotification(res.error || 'Failed to load tags', res.code);
     };
 
     const handleOpenCreateDialog = () => {
@@ -34,10 +39,18 @@ export default function TagsPage() {
     };
 
     const handleSaveTag = async () => {
+        let res;
         if (editingTagId) {
-            await window.electronApi.updateTag(editingTagId, newTag);
+            res = await window.electronApi.updateTag(editingTagId, newTag);
         } else {
-            await window.electronApi.createTag(newTag);
+            res = await window.electronApi.createTag(newTag);
+        }
+
+        if (res.success) {
+            showNotification(editingTagId ? 'Tag updated' : 'Tag created', res.code);
+        } else {
+            showNotification(res.error || 'Failed to save tag', res.code);
+            return;
         }
         setNewTag({ name: '' });
         setEditingTagId(null);
@@ -46,8 +59,13 @@ export default function TagsPage() {
     };
 
     const handleDeleteTag = async (id: number) => {
-        await window.electronApi.deleteTag(id);
-        loadData();
+        const res = await window.electronApi.deleteTag(id);
+        if (res.success) {
+            showNotification('Tag deleted', res.code);
+            loadData();
+        } else {
+            showNotification(res.error || 'Failed to delete tag', res.code);
+        }
     };
 
     const columns: Column<any>[] = [

@@ -19,6 +19,7 @@ export interface Column<T> {
     id: keyof T | string;
     label: string;
     render?: (row: T) => React.ReactNode;
+    format?: (value: any) => string;
     align?: 'left' | 'right' | 'center';
     filterable?: boolean;
     sortable?: boolean;
@@ -118,7 +119,7 @@ export default function DataTable<T extends { id: number }>({ columns, data, onD
                         <TableRow key={row.id}>
                             {columns.map((col) => (
                                 <TableCell key={String(col.id)} align={col.align || 'left'}>
-                                    {col.render ? col.render(row) : (row as any)[col.id]}
+                                    {col.render ? col.render(row) : (col.format ? col.format((row as any)[col.id]) : (row as any)[col.id])}
                                 </TableCell>
                             ))}
                             {(onDelete || onEdit) && (

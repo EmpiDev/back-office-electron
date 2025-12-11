@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNotification } from '../../../contexts/NotificationContext';
 import { Box, Typography, Button, TextField, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Grid, InputAdornment, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { Add as AddIcon, Search as SearchIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -16,9 +17,13 @@ export default function UsersPage() {
         loadData();
     }, []);
 
+
+    const { showNotification } = useNotification();
+
     const loadData = async () => {
-        const u = await window.electronApi.getUsers();
-        setUsers(u);
+        const res = await window.electronApi.getUsers();
+        if (res.success) setUsers(res.data);
+        else showNotification(res.error || 'Failed to load users', res.code);
     };
 
     const handleOpenCreateDialog = () => {
@@ -38,14 +43,22 @@ export default function UsersPage() {
     };
 
     const handleSaveUser = async () => {
+        let res;
         if (editingUserId) {
              // If password is empty, maybe don't update it?
              // The backend logic for updateUser currently ignores password updates (see previous context)
              // But let's send what we have.
-            await window.electronApi.updateUser(editingUserId, newUser);
+            res = await window.electronApi.updateUser(editingUserId, newUser);
         } else {
-            await window.electronApi.createUser(newUser);
+            res = await window.electronApi.createUser(newUser);
         }
+
+        if (!res.success) {
+            showNotification(res.error || 'Failed to save user', res.code);
+            return;
+        }
+
+        showNotification(editingUserId ? 'User updated' : 'User created', res.code);
         setNewUser({ username: '', password_hash: '123456', role: 'user' });
         setEditingUserId(null);
         setOpenDialog(false);
@@ -53,8 +66,13 @@ export default function UsersPage() {
     };
 
     const handleDeleteUser = async (id: number) => {
-        await window.electronApi.deleteUser(id);
-        loadData();
+        const res = await window.electronApi.deleteUser(id);
+        if (res.success) {
+             showNotification('User deleted', res.code);
+             loadData();
+        } else {
+             showNotification(res.error || 'Failed to delete', res.code);
+        }
     };
 
     const columns: Column<any>[] = [

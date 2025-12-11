@@ -1,10 +1,6 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronApi", {
-    ping: () => ipcRenderer.invoke("ping"),
-    openFileDialog: () => ipcRenderer.invoke("dialog:openFile"),
-    notifyJokeAdded: (joke) => ipcRenderer.invoke('jokes:notify-added', joke),
-
     // Users
     getUsers: () => ipcRenderer.invoke('users:get-all'),
     createUser: (user) => ipcRenderer.invoke('users:create', user),

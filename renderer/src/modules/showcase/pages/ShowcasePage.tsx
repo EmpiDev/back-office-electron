@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNotification } from '../../../contexts/NotificationContext';
 import { Box, Typography, Paper, Grid, Card, CardContent, CardActions, Button, Switch, FormControlLabel, TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import StarIcon from '@mui/icons-material/Star';
@@ -21,14 +22,20 @@ export default function ShowcasePage() {
         loadData();
     }, []);
 
+
+    const { showNotification } = useNotification();
+
     const loadData = async () => {
-        const p = await window.electronApi.getProducts();
+        const prodRes = await window.electronApi.getProducts();
+        if (!prodRes.success) { showNotification(prodRes.error || 'Failed to load', prodRes.code); return; }
+        const p = prodRes.data;
         
-        const tags = await window.electronApi.getTags();
+        const tagsRes = await window.electronApi.getTags();
+        const tags = tagsRes.success ? tagsRes.data : [];
 
         const productsWithTags = await Promise.all(p.map(async (product: any) => {
-             const productTags = await window.electronApi.getTagsForProduct(product.id);
-             return { ...product, tags: productTags };
+             const productTagsRes = await window.electronApi.getTagsForProduct(product.id);
+             return { ...product, tags: productTagsRes.success ? productTagsRes.data : [] };
         }));
 
         setProducts(productsWithTags);
@@ -44,14 +51,19 @@ export default function ShowcasePage() {
              }
         }
         const updatedProduct = { ...product, is_in_carousel: !product.is_in_carousel };
-        await window.electronApi.updateProduct(product.id, updatedProduct);
-        loadData();
+        const res = await window.electronApi.updateProduct(product.id, updatedProduct);
+        if (res.success) {
+            loadData();
+        } else {
+            showNotification(res.error || 'Failed', res.code);
+        }
     };
 
     const toggleTopProduct = async (product: any) => {
         const updatedProduct = { ...product, is_top_product: !product.is_top_product };
-        await window.electronApi.updateProduct(product.id, updatedProduct);
-        loadData();
+        const res = await window.electronApi.updateProduct(product.id, updatedProduct);
+        if (res.success) loadData();
+        else showNotification(res.error || 'Failed', res.code);
     };
 
     const carouselProducts = products.filter(p => p.is_in_carousel);
