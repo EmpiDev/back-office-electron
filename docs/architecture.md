@@ -52,5 +52,28 @@ graph TD
 3. Le message transite via IPC vers le processus principal.
 4. Le `IPC Main Handler` reçoit la demande.
 5. Le handler exécute la requête `INSERT` SQL dans la base SQLite.
-6. Le résultat (succès/erreur) est renvoyé via IPC au composant React.
-7. L'UI se met à jour.
+7. L'UI se met à jour, affichant une notification de succès ou d'erreur basée sur le code retourné.
+
+## Standard de Réponse IPC
+
+Pour garantir une gestion uniforme des erreurs et des notifications, toutes les méthodes IPC retournent un objet standardisé `ApiResponse<T>` :
+
+```typescript
+interface ApiResponse<T> {
+  success: boolean;  // Indique si l'opération a réussi
+  code: number;      // Code statut (similaire HTTP) : 200 (OK), 400 (Bad Request), 500 (Server Error)
+  data: T;           // Les données demandées (si succès)
+  error?: string;    // Message d'erreur (si échec)
+}
+```
+
+## Système de Notification
+
+L'application utilise un système de notification piloté par les codes retour du backend :
+- **Backend (Electron)** : Génère un code statut (par défaut 200 ou 500, personnalisable par les services).
+- **Frontend (React)** : Un `NotificationContext` global intercepte les réponses.
+    - Code **2xx** -> Notification de succès (Vert).
+    - Code **4xx** -> Notification d'avertissement (Orange).
+    - Code **5xx** -> Notification d'erreur (Rouge).
+
+Cela permet de centraliser la logique de feedback utilisateur et de garder le code des composants propre.
