@@ -40,6 +40,9 @@ npm run dev
 - `renderer/` : Frontend (React, Material UI, Vite).
 - `docs/` : Documentation technique (Architecture, Modèles, Cas d'usage).
 
+![Architecture du Projet](./docs/assets/archi.jpg)
+
+
 ##  Documentation Technique
 
 Pour plus de détails sur la conception de l'application, veuillez consulter le dossier `docs/` :
